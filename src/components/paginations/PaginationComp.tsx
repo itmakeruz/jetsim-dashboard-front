@@ -4,7 +4,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-function PaginationComp({ total, current, totalPages, limit }) {
+interface PaginationCompProps {
+  total: number;
+  current: number;
+  totalPages: number;
+  limit?: number;
+}
+
+function PaginationComp({ total, current, totalPages, limit }: PaginationCompProps) {
   const navigate = useNavigate();
   const { page } = useParams();
   const onChange = (page) => {
@@ -26,6 +33,7 @@ function PaginationComp({ total, current, totalPages, limit }) {
       behavior: "smooth",
     });
   }, [page]);
+
   return (
     <div className="flex items-center shrink-0 mt-5 justify-center gap-2">
       <Pagination
@@ -73,11 +81,10 @@ function PaginationComp({ total, current, totalPages, limit }) {
             const isActive = current === pageNumber;
             return (
               <button
-                className={`rounded !border-0 w-[24px] cursor-pointer h-[24px] text-sm font-medium transition ${
-                  isActive
-                    ? "bg-main-blue text-black"
-                    : "bg-white text-gray-700 hover:bg-main-grey"
-                }`}
+                className={`rounded !border-0 w-[24px] cursor-pointer h-[24px] text-sm font-medium transition ${isActive
+                  ? "bg-main-blue text-black"
+                  : "bg-white text-gray-700 hover:bg-main-grey"
+                  }`}
                 onClick={() => onChange(pageNumber)}
               >
                 {pageNumber}

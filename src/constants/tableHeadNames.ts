@@ -9,14 +9,22 @@ export const tariffsTableHeadItems = [
   "Действие",
 ];
 
+export const regionGroupsTableHeadItems = [
+  "ID",
+  "Флаг",
+  "Название (RU)",
+  "Название (EN)",
+  "Регионы",
+  "Действие",
+];
+
 export const regionsTableHeadItems = [
-  "№",
+  "ID",
+  "Флаг",
   "Название (RU)",
   "Название (EN)",
   "Действие",
 ];
-
-export const regionsTableHeadItems2 = ["ID", "Название", "Действие"];
 
 export const newsTableHeadItems = [
   "№",

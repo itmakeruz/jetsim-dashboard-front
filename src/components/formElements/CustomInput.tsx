@@ -9,9 +9,9 @@ interface CustomInputProps {
   defaultValue?: string;
   className?: string;
   label?: string;
-  error?: string;
   divClassname?: string;
   disabled?: boolean;
+  accept?: string;
 }
 
 const CustomInput = ({
@@ -25,8 +25,8 @@ const CustomInput = ({
   defaultValue,
   className = "",
   label,
-  error,
   divClassname = "",
+  accept,
   ...rest
 }: CustomInputProps) => {
   return (
@@ -37,19 +37,17 @@ const CustomInput = ({
         name={name}
         type={type}
         placeholder={placeholder}
+        accept={accept}
         value={type === "file" ? undefined : value}
         onChange={onChange}
         defaultValue={defaultValue}
         disabled={disabled}
         required={required}
-        className={`border w-full outline-none px-4 border-[rgb(116,120,141,0.35)] py-3 rounded text-sm ${
-          error && "border-red-500"
-        } ${disabled ? "!border-transparent" : ""}
+        className={`border w-full outline-none px-4 border-[rgb(116,120,141,0.35)] py-3 rounded text-sm ${disabled ? "!border-transparent" : ""}
         ${className} 
         `}
         {...rest}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };

@@ -21,36 +21,32 @@ const adminMenu = [
     label: "Пользователи",
     icon: Users,
   },
-
   {
-    path: "/partners",
-    label: "Партнеры",
-    icon: UserCog,
+    label: "Транзакции",
+    path: "/settings/transactions",
+    icon: FaMoneyBillTransfer,
   },
-
   {
     label: "Регионы",
     icon: Building2,
     children: [
       {
-        path: "/reference-tables/regions",
-        label: "Список регионов",
-        icon: Building2,
+        path: "/reference-tables/region-groups",
+        label: "Регион группы",
+        icon: Globe,
       },
       {
-        path: "/reference-tables/region-groups",
-        label: "Группы регионов",
-        icon: Globe,
+        path: "/reference-tables/regions",
+        label: "Регионы",
+        icon: Building2,
       },
     ],
   },
-
   {
     path: "/reference-tables/tariffs",
     label: "Тарифы",
     icon: ClipboardList,
   },
-
   {
     label: "Заказы",
     icon: List,
@@ -59,25 +55,23 @@ const adminMenu = [
       { path: "/orders/cancelled", label: "Отмененные", icon: X },
     ],
   },
-
-  {
-    label: "Настройки",
-    icon: Settings,
-    children: [
-      {
-        path: "/settings/transactions",
-        label: "Транзакции",
-        icon: FaMoneyBillTransfer,
-      },
-    ],
-  },
-
   {
     label: "Сайт",
     icon: Globe,
     children: [
       { path: "/site/news", label: "Новости", icon: Newspaper },
       { path: "/site/faq", label: "FAQ", icon: CircleHelp },
+    ],
+  },
+  {
+    label: "Настройки",
+    icon: Settings,
+    children: [
+      {
+        path: "/partners",
+        label: "Партнеры",
+        icon: UserCog,
+      },
     ],
   },
 ];

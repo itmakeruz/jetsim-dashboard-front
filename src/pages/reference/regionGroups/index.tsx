@@ -13,12 +13,11 @@ import UniversalTable from "@/components/tables/UniversalTables";
 import EmptyDatas from "@/components/empty/EmptyDatas";
 import PaginationComp from "@/components/paginations/PaginationComp";
 
-import { regionsTableHeadItems } from "@/constants/tableHeadNames";
+import { regionGroupsTableHeadItems } from "@/constants/tableHeadNames";
 import RegionsGroupForm from "./components/RegionsGroupForm";
 import RegionsGroupTbody from "./components/RegionsGroupTbody";
 import CustomInput from "@/components/formElements/CustomInput";
 import Loader from "@/components/Loader";
-import { size } from "@/constants/paginationStuffs";
 
 function RegionsGroup() {
   const queryClient = useQueryClient();
@@ -36,38 +35,34 @@ function RegionsGroup() {
   const isEditMode = modalType === "edit";
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get("page")) || 1;
-  const pageSize = size;
-
-  // Check if token exists
-  const token = localStorage.getItem("token");
 
   // Fetch region groups with TanStack Query
   const {
     data: response,
     isLoading,
-    error,
   } = useQuery({
-    queryKey: ["regionGroups"],
-    queryFn: referenceAPI.getRegionGroups,
-    enabled: !!token, // Only fetch if token exists
+    queryKey: ["regionGroups", currentPage, debouncedSearch],
+    queryFn: () => referenceAPI.getRegionGroups({
+      page: currentPage,
+      search: debouncedSearch || undefined,
+    }),
     staleTime: Infinity, // Data never becomes stale
-    gcTime: Infinity, // Keep data in cache indefinitely
-    refetchOnMount: false, // Don't refetch on component mount
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
-  const allData = response?.data?.data || [];
+  const datas = response?.data?.data || [];
+  const meta = response?.data?.meta || {};
 
   // Create mutation
   const createMutation = useMutation({
     mutationFn: (data: FormData) => referenceAPI.createRegionGroup(data),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
-      showToast.success("Группа регионов успешно создана!");
+      showToast.success(response?.data?.message || "Группа регионов успешно создана!");
       closeModal();
     },
-    onError: () => {
-      showToast.error("Произошла ошибка при создании группы");
+    onError: (error: any) => {
+      showToast.error(error?.response?.data?.message || "Произошла ошибка при создании группы");
     },
   });
 
@@ -75,45 +70,27 @@ function RegionsGroup() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormData }) =>
       referenceAPI.updateRegionGroup(id, data),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
-      showToast.success("Группа регионов успешно обновлена!");
+      showToast.success(response?.data?.message || "Группа регионов успешно обновлена!");
       closeModal();
     },
-    onError: () => {
-      showToast.error("Произошла ошибка при обновлении группы");
+    onError: (error: any) => {
+      showToast.error(error?.response?.data?.message || "Произошла ошибка при обновлении группы");
     },
   });
-
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: (id: number) => referenceAPI.deleteRegionGroup(id),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
-      showToast.success("Группа регионов успешно удалена!");
+      showToast.success(response?.data?.message || "Группа регионов успешно удалена!");
       closeModal();
     },
-    onError: () => {
-      showToast.error("Произошла ошибка при удалении группы");
+    onError: (error: any) => {
+      showToast.error(error?.response?.data?.message || "Произошла ошибка при удалении группы");
     },
   });
-
-  // Filter data based on search
-  const filteredData = debouncedSearch
-    ? allData.filter(
-        (item: any) =>
-          item.name_ru?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          item.name_en?.toLowerCase().includes(debouncedSearch.toLowerCase())
-      )
-    : allData;
-
-  // Paginate data
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const datas = filteredData.slice(startIndex, endIndex);
-
-  const totalItems = filteredData.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
 
   const closeModal = () => {
     setIsShow(false);
@@ -178,7 +155,7 @@ function RegionsGroup() {
   }, [debouncedSearch]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 h-full">
       <div className="flex gap-4 items-center">
         <UniversalBtn
           className="self-start text-sm"
@@ -188,7 +165,7 @@ function RegionsGroup() {
           }}
           icon={Plus}
         >
-          Добавить группу
+          Добавить регион группу
         </UniversalBtn>
 
         <div className="w-full flex items-center bg-white max-w-[520px]">
@@ -210,7 +187,7 @@ function RegionsGroup() {
       {isShow && (
         <UniversalModal
           isShow={isShow}
-          title={isEditMode ? "Изменить группу" : "Добавить группу"}
+          title={isEditMode ? "Изменить регион группу" : "Добавить регион группу"}
           btnText={isEditMode ? "Изменить" : "Добавить"}
           onClose={closeModal}
           onSubmit={handleSubmit}
@@ -233,17 +210,17 @@ function RegionsGroup() {
         />
       )}
 
-      <div className="relative">
+      <div className="relative grow overflow-hidden flex flex-col">
         {isLoading ? (
           <Loader isFullScreen={false} />
         ) : datas?.length > 0 ? (
-          <div className="bg-white rounded shadow p-4">
+          <div className="bg-white rounded shadow p-4 h-full overflow-hidden">
             <UniversalTable
-              tableHeadItems={regionsTableHeadItems}
-              className="grid-cols-[50px_1fr_1fr_auto]"
+              tableHeadItems={regionGroupsTableHeadItems}
+              className="grid-cols-[50px_100px_1fr_1fr_1fr_.1fr]"
             >
               <RegionsGroupTbody
-                className="grid-cols-[50px_1fr_1fr_auto]"
+                className="grid-cols-[50px_100px_1fr_1fr_1fr_.1fr]"
                 datas={datas}
                 onEdit={(item) => {
                   setSelectedData(item);
@@ -257,17 +234,16 @@ function RegionsGroup() {
                 }}
               />
             </UniversalTable>
-
-            <PaginationComp
-              current={currentPage}
-              total={totalItems}
-              totalPages={totalPages}
-              limit={pageSize}
-            />
           </div>
         ) : (
           <EmptyDatas />
         )}
+        <PaginationComp
+          current={meta.currentPage || currentPage}
+          total={meta.totalItems || 0}
+          totalPages={meta.totalPage || 1}
+          limit={meta.totalSize || 20}
+        />
       </div>
     </div>
   );

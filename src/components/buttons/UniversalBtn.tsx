@@ -1,5 +1,15 @@
 import { Loader2 } from "lucide-react";
 
+interface UniversalBtnProps {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  loading?: boolean;
+  icon?: React.ElementType;
+  iconPosition?: "left" | "right";
+}
 function UniversalBtn({
   children,
   className = "",
@@ -9,7 +19,7 @@ function UniversalBtn({
   loading = false,
   icon: Icon,
   iconPosition = "left",
-}) {
+}: UniversalBtnProps) {
   return (
     <button
       type={type}

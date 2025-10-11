@@ -1,34 +1,60 @@
 // src/pages/Login.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-toastify";
 import CustomInput from "@/components/formElements/CustomInput";
 import UniversalBtn from "@/components/buttons/UniversalBtn";
 import { handleChange } from "@/utils/handleChange";
+import Loader from "@/components/Loader";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, token, getProfile, logout } = useAuthStore();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const [form, setForm] = useState({
     login: "",
     password: "",
   });
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      if (token) {
+        try {
+          const result = await getProfile();
+          if (result.success) {
+            navigate("/", { replace: true });
+            return;
+          } else {
+            logout()
+            toast.error(result.message);
+          }
+        } catch (error) {
+          console.log("Token invalid:", error);
+        }
+      }
+      setIsCheckingAuth(false);
+    };
+
+    checkExistingAuth();
+  }, [token, getProfile, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const result = await login(form);
-    console.log(result);
-
     if (result.success) {
-      toast.success("Вход выполнен успешно!");
+      toast.success(result.message);
       navigate("/");
     } else {
-      toast.error(result.error || "Ошибка входа!");
+      toast.error(result.message || "Ошибка входа!");
     }
   };
+
+  if (isCheckingAuth) {
+    return <Loader isFullScreen />;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
@@ -41,7 +67,7 @@ export default function Login() {
         <CustomInput
           type="text"
           name="login"
-          placeholder="login"
+          placeholder="Username"
           value={form.login}
           onChange={handleChange(setForm)}
           required
@@ -50,7 +76,7 @@ export default function Login() {
         <CustomInput
           type="password"
           name="password"
-          placeholder="Пароль"
+          placeholder="Password"
           value={form.password}
           onChange={handleChange(setForm)}
           required

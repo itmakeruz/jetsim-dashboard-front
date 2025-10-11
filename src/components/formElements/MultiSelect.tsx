@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronDown, X, Search } from "lucide-react";
 import CustomLabel from "./CustomLabel";
 import { useApi } from "@/hooks/useApi";
+import { useQuery } from "@tanstack/react-query";
+import { referenceAPI } from "@/lib/api";
 
 const MultiSelect = ({
   value = [],
@@ -28,21 +30,24 @@ const MultiSelect = ({
   const [selectedItems, setSelectedItems] = useState(value);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const dropdownRef = useRef(null);
-
-  // Backend search functionality
+  const shouldFetch = enableBackendSearch && !!debouncedSearchTerm.trim() && !!searchEndpoint;
+  // Fetch regions with TanStack Query
   const {
     data: searchResults,
     isLoading: isSearching,
     error: searchError,
-  } = useApi({
-    endpoint:
-      enableBackendSearch && debouncedSearchTerm.trim() && searchEndpoint
-        ? `${searchEndpoint}?${searchParam}=${debouncedSearchTerm.trim()}`
-        : null,
-    method: "GET",
-    enabled:
-      enableBackendSearch && !!debouncedSearchTerm.trim() && !!searchEndpoint,
+  } = useQuery({
+    queryKey: ["regions", debouncedSearchTerm],
+    queryFn: () => referenceAPI.getRegions({
+      search: debouncedSearchTerm.trim(),
+      endpoint: `${searchEndpoint}?${searchParam}=${debouncedSearchTerm.trim()}`,
+    }),
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    enabled: shouldFetch,
   });
+
+
 
   // Debounce search term for backend API calls
   useEffect(() => {
@@ -89,8 +94,7 @@ const MultiSelect = ({
       return options.filter(
         (option) =>
           option.label?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          option.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          option.ssid?.toLowerCase().includes(searchTerm.toLowerCase())
+          option.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
   }, [
@@ -106,13 +110,13 @@ const MultiSelect = ({
 
   const handleToggleItem = (item) => {
     const isSelected = selectedItems.some(
-      (selected) => selected.id === item.id || selected.ssid === item.ssid
+      (selected) => selected.id === item.id
     );
 
     let newSelectedItems;
     if (isSelected) {
       newSelectedItems = selectedItems.filter(
-        (selected) => selected.id !== item.id && selected.ssid !== item.ssid
+        (selected) => selected.id !== item.id
       );
     } else {
       newSelectedItems = [...selectedItems, item];
@@ -128,19 +132,10 @@ const MultiSelect = ({
 
   const handleRemoveItem = (itemToRemove) => {
     const newSelectedItems = selectedItems.filter(
-      (item) => item.id !== itemToRemove.id && item.ssid !== itemToRemove.ssid
+      (item) => item.id !== itemToRemove.id
     );
     setSelectedItems(newSelectedItems);
     onChange({ target: { name, value: newSelectedItems } });
-  };
-
-  const getDisplayValue = () => {
-    if (selectedItems.length === 0) return placeholder;
-    if (selectedItems.length === 1) {
-      const item = selectedItems[0];
-      return item.label || item.name || item.ssid || "Tanlangan";
-    }
-    return `${selectedItems.length} ta tanlangan`;
   };
 
   const handleSearchChange = (e) => {
@@ -150,11 +145,9 @@ const MultiSelect = ({
   return (
     <div className={`${divClassname}`}>
       {label && <CustomLabel labelText={label} />}
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative max-w-[320px] w-full" ref={dropdownRef}>
         <div
-          className={`${className} min-h-[42px] border border-gray-300 rounded px-3 py-2 cursor-pointer flex items-center justify-between ${
-            required && isError ? "border-red-500" : ""
-          } ${selectedItems.length > 0 ? "bg-white" : "bg-gray-50"}`}
+          className={`${className} min-h-[42px]  overflow-auto border border-gray-300 rounded px-3 py-2 cursor-pointer flex items-center justify-between `}
           onClick={() => setIsOpen(!isOpen)}
         >
           <div className="flex flex-wrap gap-1 flex-1 min-w-0">
@@ -164,10 +157,10 @@ const MultiSelect = ({
               selectedItems.map((item, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full"
+                  className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
                 >
                   <span className="truncate max-w-[120px]">
-                    {item.label || item.name || item.ssid}
+                    {item.label || item.name}
                   </span>
                   <button
                     type="button"
@@ -175,7 +168,7 @@ const MultiSelect = ({
                       e.stopPropagation();
                       handleRemoveItem(item);
                     }}
-                    className="hover:bg-orange-200 rounded-full p-0.5"
+                    className="hover:bg-blue-200 rounded-full p-0.5"
                   >
                     <X size={12} />
                   </button>
@@ -207,7 +200,7 @@ const MultiSelect = ({
                     }
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-nonea"
                     onClick={(e) => e.stopPropagation()}
                   />
                 </div>
@@ -233,47 +226,45 @@ const MultiSelect = ({
                 </div>
               ) : (
                 filteredOptions.map((option, index) => {
+
                   const isSelected = selectedItems.some(
                     (selected) =>
-                      selected.id === option.id || selected.ssid === option.ssid
+                      selected.id === option.id
                   );
                   return (
                     <div
                       key={index}
-                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 flex items-center gap-2 ${
-                        isSelected ? "bg-orange-50" : ""
-                      }`}
+                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 flex items-center gap-2 ${isSelected ? "bg-orange-50" : ""
+                        }`}
                       onClick={() => handleToggleItem(option)}
                     >
                       <div
-                        className={`w-4 h-4 border-2 rounded ${
-                          isSelected
-                            ? "bg-orange-500 border-orange-500"
-                            : "border-gray-300"
-                        } flex items-center justify-center`}
+                        className={`w-4 h-4 border-2 rounded ${isSelected
+                          ? "bg-blue-500 border-blue-500"
+                          : "border-gray-300"
+                          } flex items-center justify-center`}
                       >
                         {isSelected && (
                           <div className="w-2 h-2 bg-white rounded-sm"></div>
                         )}
                       </div>
                       <span className="flex-1">
-                        {option.label || option.name || option.ssid}
+                        {option.label || option.name}
                       </span>
                       {option.status && (
                         <span
-                          className={`px-2 py-1 rounded text-xs ${
-                            option.status === "available"
-                              ? "bg-green-100 text-green-800"
-                              : option.status === "inactive"
+                          className={`px-2 py-1 rounded text-xs ${option.status === "ACTIVE"
+                            ? "bg-green-100 text-green-800"
+                            : option.status === "INACTIVE"
                               ? "bg-red-100 text-red-800"
                               : "bg-gray-100 text-gray-800"
-                          }`}
+                            }`}
                         >
-                          {option.status === "available"
+                          {option.status === "ACTIVE"
                             ? "Mavjud"
-                            : option.status === "inactive"
-                            ? "Faol emas"
-                            : option.status}
+                            : option.status === "INACTIVE"
+                              ? "Faol emas"
+                              : option.status}
                         </span>
                       )}
                     </div>

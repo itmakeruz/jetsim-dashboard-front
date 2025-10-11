@@ -40,7 +40,7 @@ export const getImageUrl = (imagePath) => {
 
   // Construct full URL
   const baseUrl = getStorageBaseUrl();
-  return `${baseUrl}/storage/${cleanPath}`;
+  return `${baseUrl}/${cleanPath}`;
 };
 
 /**

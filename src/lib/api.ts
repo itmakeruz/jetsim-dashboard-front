@@ -4,7 +4,7 @@ import axios from "./axios";
 export const authAPI = {
   login: (data) => axios.post("/auth/login", data),
   logout: () => axios.post("/logout"),
-  getProfile: () => axios.get("/auth/me"),
+  getProfile: () => axios.get("/auth/me-staff"),
 };
 
 // Admin API - Exact match from api-data.json
@@ -295,29 +295,29 @@ export const settingsAPI = {
 // Legacy API exports for backward compatibility
 export const referenceAPI = {
   // Region Groups (Categories)
-  getRegionGroups: () => axios.get("/region/admin/category"),
+  getRegionGroups: (params) => axios.get("/region/admin/category", { params }),
   createRegionGroup: (data) =>
     axios.post("/region/category", data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   updateRegionGroup: (id, data) =>
-    axios.put(`/region/category/${id}`, data, {
+    axios.patch(`/region/category/${id}`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   deleteRegionGroup: (id) => axios.delete(`/region/category/${id}`),
 
   // Regions
-  getRegions: () => axios.get("/regions"),
+  getRegions: (params) => axios.get("/region/admin", { params }),
   createRegion: (data) =>
-    axios.post("/regions", data, {
+    axios.post("/region", data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   updateRegion: (id, data) =>
-    axios.put(`/regions/${id}`, data, {
+    axios.patch(`/region/${id}`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
-  deleteRegion: (id) => axios.delete(`/regions/${id}`),
-  getRegionById: (id) => axios.get(`/regions/${id}`),
+  deleteRegion: (id) => axios.delete(`/region/${id}`),
+  getRegionById: (id) => axios.get(`/region/${id}`),
 
   // Clients
   getClients: () => axios.get("/clients"),

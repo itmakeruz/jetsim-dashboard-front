@@ -1,68 +1,63 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import CustomInput from "@/components/formElements/CustomInput";
 import { getImageUrl } from "@/utils/imageUtils";
 
-function RegionsForm({ onChange, formData, required, selectedData }) {
-  const [previewImage, setPreviewImage] = useState(null);
+import { handleChange } from './../../../../utils/handleChange';
 
-  const handleFileChange = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setPreviewImage(ev.target.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setPreviewImage(null);
-    }
-    onChange(e);
-  };
+interface RegionsFormProps {
+  formData: any;
+  setFormData: any;
+  editData: any;
+}
+
+function RegionsForm({ formData, setFormData, editData }: RegionsFormProps) {
+  const [previewImage, setPreviewImage] = useState(null);
 
   return (
     <>
       <CustomInput
-        onChange={onChange}
+        onChange={handleChange(setFormData)}
         className="max-w-[320px]"
-        label="Название"
-        placeholder="Название"
-        name="name"
-        value={formData?.name ?? selectedData?.name ?? ""}
-        required={required}
+        label="Название (RU)"
+        placeholder="Название на русском"
+        name="name_ru"
+        value={formData?.name_ru ?? ""}
+        required
+      />
+
+      <CustomInput
+        onChange={handleChange(setFormData)}
+        className="max-w-[320px]"
+        label="Название (EN)"
+        placeholder="Название на английском"
+        name="name_en"
+        value={formData?.name_en ?? ""}
+        required
       />
       <CustomInput
-        onChange={handleFileChange}
+        onChange={handleChange(setFormData, setPreviewImage)}
         className="max-w-[320px] cursor-pointer"
         label="Изображение"
         placeholder="Изображение"
-        name="img"
+        name="image"
         type="file"
-        required={required}
+        required={!editData}
       />
-      {(previewImage || formData?.img || selectedData?.img) && (
-        <div className="mt-2 ml-auto">
+
+      {(previewImage || formData?.image || editData?.image) && (
+        <div className="mt-2">
           <img
-            className="w-8 h-8 object-cover rounded-lg border border-gray-300"
+            className="w-16 h-16 object-cover rounded-lg border border-gray-300"
             src={
               previewImage ||
-              (typeof (formData?.img || selectedData?.img) === "string"
-                ? getImageUrl(formData?.img || selectedData?.img)
+              (typeof (formData?.image || editData?.image) === "string"
+                ? getImageUrl(formData?.image || editData?.image)
                 : null)
             }
             alt="Region image"
           />
         </div>
       )}
-      <label className="flex gap-2 items-center select-none text-[16px] text-main-black font-normal">
-        <input
-          type="checkbox"
-          name="selecting"
-          checked={formData?.selecting == "1" || selectedData?.selecting == "1"}
-          onChange={onChange}
-          className="self-start text-[16px]"
-        />
-        Чаще выбирают
-      </label>
     </>
   );
 }

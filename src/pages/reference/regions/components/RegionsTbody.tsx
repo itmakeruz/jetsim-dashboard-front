@@ -1,6 +1,23 @@
+import { getImageUrl } from "@/utils/imageUtils";
 import { Pencil, Trash2 } from "lucide-react";
 
-function RegionsTbody({ datas, onEdit, onDelete, className }) {
+interface Item {
+  id: number;
+  name_ru: string;
+  name_en: string;
+  image: string;
+  status: string;
+}
+
+interface RegionsTbodyProps {
+  datas: Item[];
+  onEdit: (item: any) => void;
+  onDelete: (item: any) => void;
+  className?: string;
+}
+
+function RegionsTbody({ datas, onEdit, onDelete, className }: RegionsTbodyProps) {
+
   return (
     <>
       {datas.map((item, index) => (
@@ -9,7 +26,17 @@ function RegionsTbody({ datas, onEdit, onDelete, className }) {
           className={`grid w-full min-h-[36px] border-t border-[#E3E4E8] items-center gap-4 text-sm text-main-black font-medium ${className}`}
         >
           <span>{item?.id}</span>
-          <span className="uppercase">{item.name}</span>
+          {item.image ? (
+            <img
+              src={getImageUrl(item.image)}
+              alt={item.name_ru}
+              className="w-12 h-8 object-cover rounded-[2px] overflow-hidden border"
+            />
+          ) : (
+            <span className="text-gray-400">-</span>
+          )}
+          <span className="uppercase">{item.name_ru}</span>
+          <span className="uppercase">{item.name_en}</span>
           <div className="flex items-center justify-start gap-3">
             <Pencil
               onClick={() => onEdit(item)}

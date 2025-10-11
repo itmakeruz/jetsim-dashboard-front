@@ -38,7 +38,7 @@ th {
 }
 
 @theme {
-  --color-main-orange: #f06f1e;
+  --color-main-orange: #112D6C;
   --color-main-black: #343a40;
   --color-main-grey: #74788d;
   --font-norms: "TTNormsMedium";
@@ -63,14 +63,17 @@ select {
 .main-shadow {
   box-shadow: 0px 2px 4px 0px #0f223a26;
 }
+
 #phone {
   outline: none !important;
 }
+
 input:-webkit-autofill {
   box-shadow: 0 0 0 1000px white inset !important;
   -webkit-text-fill-color: black !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -226,6 +229,7 @@ input[type="number"] {
     transform: rotate(360deg);
   }
 }
+
 .PhoneInputInput {
   outline: none !important;
   box-shadow: none !important;
