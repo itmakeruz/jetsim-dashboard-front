@@ -3,6 +3,8 @@ import CustomInput from "@/components/formElements/CustomInput";
 
 import { handleChange } from './../../../../utils/handleChange';
 import FormImgView from "@/components/FormImgView";
+import { statusOptions } from "@/constants/StaticOptions";
+import CustomSelect from "@/components/formElements/CustomSelect";
 
 interface RegionsFormProps {
   formData: any;
@@ -33,6 +35,15 @@ function RegionsForm({ formData, setFormData, editData }: RegionsFormProps) {
         name="name_en"
         value={formData?.name_en ?? ""}
         required
+      />
+      <CustomSelect
+        onChange={handleChange(setFormData)}
+        className="max-w-[320px] w-full"
+        label="Статус"
+        placeholder="Статус"
+        name="status"
+        value={formData?.status ?? ""}
+        options={statusOptions}
       />
       <CustomInput
         onChange={handleChange(setFormData, setPreviewImage)}

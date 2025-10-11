@@ -1,10 +1,10 @@
 import { Plus, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { showToast } from "@/utils/toastHelper";
-import { useMockData } from "@/hooks/useMockData";
-import { mockPartners, generateId } from "@/data/mockData";
+import { referenceAPI } from "@/lib/api";
 
 import UniversalBtn from "@/components/buttons/UniversalBtn";
 import CustomInput from "@/components/formElements/CustomInput";
@@ -29,6 +29,7 @@ const partnersTableHeadItems = [
 ];
 
 function Partners() {
+  const queryClient = useQueryClient();
   const [isShow, setIsShow] = useState(false);
   const [formData, setFormData] = useState({
     name_ru: "",
@@ -48,32 +49,61 @@ function Partners() {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const pageSize = size;
 
-  const {
-    data: allData,
-    isLoading,
-    createItem,
-    updateItem,
-    deleteItem,
-  } = useMockData({
-    initialData: mockPartners,
+  // Fetch partners
+  const { data: partnersResponse, isLoading } = useQuery({
+    queryKey: ["partners", currentPage, debouncedSearch],
+    queryFn: () =>
+      referenceAPI.getPartners({
+        page: currentPage,
+        ...(debouncedSearch && { search: debouncedSearch }),
+      }),
+    staleTime: 30000,
   });
 
-  // Filter data based on search
-  const filteredData = debouncedSearch
-    ? allData.filter(
-        (item) =>
-          item.name_ru.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          item.name_en.toLowerCase().includes(debouncedSearch.toLowerCase())
-      )
-    : allData;
+  const datas = partnersResponse?.data?.data || [];
+  const meta = partnersResponse?.data?.meta || {};
+  const totalItems = meta.totalItems || 0;
+  const totalPages = meta.totalPage || 1;
 
-  // Paginate data
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const datas = filteredData.slice(startIndex, endIndex);
+  // Create mutation
+  const createMutation = useMutation({
+    mutationFn: (data: any) => referenceAPI.createPartner(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partners"] });
+      showToast.success("Партнер успешно создан!");
+      closeModal();
+    },
+    onError: () => {
+      showToast.error("Произошла ошибка при создании партнера");
+    },
+  });
 
-  const totalItems = filteredData.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) =>
+      referenceAPI.updatePartner(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partners"] });
+      showToast.success("Партнер успешно обновлен!");
+      closeModal();
+    },
+    onError: () => {
+      showToast.error("Произошла ошибка при обновлении партнера");
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => referenceAPI.deletePartner(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partners"] });
+      showToast.success("Партнер успешно удален!");
+      closeModal();
+    },
+    onError: () => {
+      showToast.error("Произошла ошибка при удалении партнера");
+    },
+  });
 
   const closeModal = () => {
     setIsShow(false);
@@ -92,32 +122,16 @@ function Partners() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    try {
-      if (isEditMode) {
-        await updateItem(selectedData.id, formData);
-        showToast.success("Партнер успешно обновлен!");
-      } else {
-        const newItem = {
-          ...formData,
-          id: generateId(),
-          created_at: new Date().toISOString(),
-        };
-        await createItem(newItem);
-        showToast.success("Партнер успешно создан!");
-      }
-      closeModal();
-    } catch (error) {
-      showToast.error("Произошла ошибка");
+    if (isEditMode) {
+      updateMutation.mutate({ id: selectedData.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
     }
   };
 
   const handleDelete = async () => {
-    try {
-      await deleteItem(selectedData.id);
-      showToast.success("Партнер удален!");
-      closeModal();
-    } catch (error) {
-      showToast.error("Произошла ошибка");
+    if (selectedData?.id) {
+      deleteMutation.mutate(selectedData.id);
     }
   };
 
@@ -175,7 +189,9 @@ function Partners() {
           btnText={isEditMode ? "Изменить" : "Добавить"}
           onClose={closeModal}
           onSubmit={handleSubmit}
-          loading={isLoading}
+          loading={
+            createMutation.isPending || updateMutation.isPending
+          }
         >
           <PartnersForm
             editData={selectedData}
@@ -190,7 +206,7 @@ function Partners() {
           onClose={closeModal}
           handleDelete={handleDelete}
           selectedData={selectedData}
-          loading={isLoading}
+          loading={deleteMutation.isPending}
         />
       )}
 
@@ -206,6 +222,8 @@ function Partners() {
               <PartnersTbody
                 className="grid-cols-[50px_1fr_2fr_100px_120px_auto]"
                 datas={datas}
+                currentPage={currentPage}
+                pageSize={pageSize}
                 onEdit={(item) => {
                   setSelectedData(item);
                   setFormData(item);

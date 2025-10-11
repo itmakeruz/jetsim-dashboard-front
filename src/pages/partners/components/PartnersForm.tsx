@@ -1,11 +1,17 @@
 import CustomInput from "@/components/formElements/CustomInput";
 import CustomLabel from "@/components/formElements/CustomLabel";
+import CustomSelect from "@/components/formElements/CustomSelect";
 
 interface PartnersFormProps {
   formData: any;
   setFormData: (data: any) => void;
   editData?: any;
 }
+
+const statusOptions = [
+  { id: "ACTIVE", name: "Активный" },
+  { id: "INACTIVE", name: "Неактивный" },
+];
 
 function PartnersForm({ formData, setFormData, editData }: PartnersFormProps) {
   return (
@@ -69,14 +75,13 @@ function PartnersForm({ formData, setFormData, editData }: PartnersFormProps) {
       </div>
       <div>
         <CustomLabel>Статус</CustomLabel>
-        <select
-          className="w-full border rounded p-2"
+        <CustomSelect
           value={formData.status}
+          options={statusOptions}
+          placeholder="Выберите статус"
           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-        >
-          <option value="ACTIVE">Активный</option>
-          <option value="INACTIVE">Неактивный</option>
-        </select>
+          name="status"
+        />
       </div>
     </div>
   );

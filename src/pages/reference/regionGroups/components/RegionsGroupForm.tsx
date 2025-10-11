@@ -5,6 +5,8 @@ import MultiSelect from "@/components/formElements/MultiSelect";
 import { referenceAPI } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import FormImgView from "@/components/FormImgView";
+import CustomSelect from "@/components/formElements/CustomSelect";
+import { statusOptions } from "@/constants/StaticOptions";
 function RegionsGroupForm({ formData, setFormData, editData }) {
   const [previewImage, setPreviewImage] = useState(null);
 
@@ -70,6 +72,14 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
         type="file"
         accept="image/*"
         required={!editData}
+      /> <CustomSelect
+        onChange={handleChange(setFormData)}
+        className="max-w-[320px] w-full"
+        label="Статус"
+        placeholder="Статус"
+        name="status"
+        value={formData?.status ?? ""}
+        options={statusOptions}
       />
       <MultiSelect
         label="Регионы"

@@ -1,14 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import Select from "react-select";
-
 import { Checkbox } from "@/components/ui/checkbox";
-import { useApi } from "@/hooks/useApi";
-
+import { useQuery } from "@tanstack/react-query";
+import { referenceAPI } from "@/lib/api";
+import MultiSelect from "@/components/formElements/MultiSelect";
+import Select from "react-select";
 const getSelectOptions = (options, valueKey, labelKey) =>
   options
-    ?.sort((a, b) => a.name.localeCompare(b.name))
+    ?.sort((a, b) => {
+      const aName = a[labelKey] || "";
+      const bName = b[labelKey] || "";
+      return aName.localeCompare(bName);
+    })
     .map((opt) => ({
       value: opt[valueKey],
       label: opt[labelKey],
@@ -17,7 +21,7 @@ const getSelectOptions = (options, valueKey, labelKey) =>
 const getSelectValue = (
   formData,
   name,
-  isMulti,
+  isMulti = false,
   options,
   valueKey,
   labelKey
@@ -29,7 +33,6 @@ const getSelectValue = (
 
     return rawValue
       .map((val) => {
-        // Agar val object bo'lsa (edit mode)
         if (typeof val === "object" && val !== null) {
           return {
             value: val[valueKey],
@@ -40,6 +43,7 @@ const getSelectValue = (
         }
         // Agar val faqat ID bo'lsa (create mode)
         const opt = options.find((o) => o[valueKey] === val);
+
         return opt ? { value: val, label: opt[labelKey] } : null;
       })
       .filter(Boolean);
@@ -65,31 +69,20 @@ export default function TariffsForm({
   formData,
   setFormData,
 }) {
-  // GET statuses for form
-  const { data: statuses = [], isPending: isStatusesPending } = useApi({
-    endpoint: "/plan-statuses",
-    method: "GET",
+  // GET partners for form
+  const { data: partnersResponse } = useQuery({
+    queryKey: ["partners"],
+    queryFn: () => referenceAPI.getPartners({ page: 1 }),
+    staleTime: Infinity,
   });
-  // GET providers for form
-  const { data: providers = [], isPending: isProvidersPending } = useApi({
-    endpoint: "/providers",
-    method: "GET",
-  });
-  // GET types for form
-  const { data: types = [], isPending: isTypesPending } = useApi({
-    endpoint: "/plan-types",
-    method: "GET",
-  });
-  // GET region groups for form
-  const { data: regionGroups = [], isPending: isRegionGroupsPending } = useApi({
-    endpoint: "/region-groups",
-    method: "GET",
-  });
+  const partners = partnersResponse?.data?.data || [];
   // GET regions for form
-  // const { data: regions = [], isPending: isRegionsPending } = useApi({
-  //   endpoint: "/regions",
-  //   method: "GET",
-  // });
+  const { data: regionsResponse } = useQuery({
+    queryKey: ["regions"],
+    queryFn: () => referenceAPI.getRegions({ page: 1 }),
+    staleTime: Infinity,
+  });
+  const regions = regionsResponse?.data?.data || [];
 
   // Edit rejimida eski datalarni yuklash
   useEffect(() => {
@@ -100,201 +93,144 @@ export default function TariffsForm({
 
   // Umumiy change handler
   const handleChange = (name, value) => {
-    setFormData((prev) => {
-      // Agar type_sim bo'lsa (faqat 1 ni tanlash)
-      if (name === "type_sim") {
-        return {
-          ...prev,
-          type_sim: value ? "esim" : "physical_sim",
-        };
-      }
-
-      // Oddiy holat
-      return { ...prev, [name]: value };
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Status options
+  const statusOptions = [
+    { id: "ACTIVE", name_ru: "Активный" },
+    { id: "INACTIVE", name_ru: "Неактивный" },
+  ];
+
+  // Type options
+  const typeOptions = [
+    { id: "TURBO", name_ru: "Turbo" },
+    { id: "STANDARD", name_ru: "Standard" },
+    { id: "PREMIUM", name_ru: "Premium" },
+  ];
 
   // Field konfiguratsiyasi
   const fields = [
     {
-      label: "Название тарифа",
-      name: "name",
+      label: "Название (RU)",
+      name: "name_ru",
       typeElement: "input",
-      isRequired: false,
+      isRequired: true,
     },
     {
-      label: "Поставщик",
-      name: "provider_id",
+      label: "Партнер",
+      name: "partner_id",
       typeElement: "select",
-      options: providers?.data || [],
-      isLoading: isProvidersPending,
+      options: partners || [],
       valueKey: "id",
-      labelKey: "name",
-      isRequired: false,
-    },
-    {
-      label: "E-SIM",
-      name: "type_sim",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Цена прихода",
-      name: "price_arrival",
-      typeElement: "input",
-      type: "number",
-    },
-    {
-      label: "Статус",
-      name: "status_id",
-      typeElement: "select",
-      options: statuses?.data || [],
-      isLoading: isStatusesPending,
-      valueKey: "id",
-      labelKey: "name",
-      isRequired: false,
-    },
-    {
-      label: "Глобальный",
-      name: "is_global",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Цена продажи",
-      name: "price_sell",
-      typeElement: "input",
-      type: "number",
-    },
-    {
-      label: "Тип тарифа",
-      name: "type_id",
-      typeElement: "select",
-      options: types?.data || [],
-      isLoading: isTypesPending,
-      valueKey: "id",
-      labelKey: "name",
-      isRequired: false,
-    },
-    {
-      label: "Популярный",
-      name: "popular",
-      typeElement: "checkbox",
+      labelKey: "name_ru",
+      isRequired: true,
     },
     {
       label: "Количество SMS",
       name: "quantity_sms",
       typeElement: "input",
       type: "number",
-    },
-    {
-      label: "Группа регионов",
-      name: "region_group_id",
+    }, {
+      label: "Название (EN)",
+      name: "name_en",
+      typeElement: "input",
+      isRequired: true,
+    }, {
+      label: "Регионы",
+      name: "region_ids",
       typeElement: "select",
-      options: regionGroups?.data || [],
-      isLoading: isRegionGroupsPending,
+      options: regions || [],
       valueKey: "id",
-      labelKey: "name",
+      labelKey: "name_ru",
+      isMulti: true,
+      isSearchable: true,
       isRequired: false,
-    },
-
-    {
-      label: "Локальный",
-      name: "is_local",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Количество GB",
-      name: "quantity_internet",
-      typeElement: "input",
-      type: "number",
-    },
-
-    {
-      label: "Количество дней",
-      name: "expiry_day",
-      typeElement: "input",
-      type: "number",
-    },
-    {
-      label: "Региональный",
-      name: "is_region",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Описание тарифа",
-      name: "description",
-      typeElement: "textarea",
-    },
-
-    {
+    }, {
       label: "Количество минут",
       name: "quantity_minute",
       typeElement: "input",
       type: "number",
     },
     {
-      label: "128 KB/s",
-      name: "tariff_128",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Примечание (UZ)",
-      name: "note_uz",
-      typeElement: "textarea",
-    },
-    {
-      label: "SKU ID (Физ)",
-      name: "fiz_sku_id",
+      label: "Описание (RU)",
+      name: "title_ru",
       typeElement: "input",
+      isRequired: false,
     },
     {
-      label: "256 KB/s",
-      name: "tariff_256",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Примечание (RU)",
-      name: "note_ru",
-      typeElement: "textarea",
-    },
-    {
-      label: "SKU ID (E-sim)",
-      name: "sku_id",
-      typeElement: "input",
-    },
-    {
-      label: "384 KB/s",
-      name: "tariff_384",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Примечание (EN)",
-      name: "note_en",
-      typeElement: "textarea",
-    },
-    {
-      label: "Кешбек",
-      name: "cashback_percent",
+      label: "Тип",
+      name: "type",
+      typeElement: "select",
+      options: typeOptions,
+      valueKey: "id",
+      labelKey: "name_ru",
+      isRequired: true,
+    }, {
+      label: "Количество интернет (GB)",
+      name: "quantity_internet",
       typeElement: "input",
       type: "number",
     },
     {
+      label: "Описание (EN)",
+      name: "title_en",
+      typeElement: "input",
+      isRequired: false,
+    },
+    {
+      label: "Статус",
+      name: "status",
+      typeElement: "select",
+      options: statusOptions,
+      valueKey: "id",
+      labelKey: "name_ru",
+      isRequired: true,
+    },
+    {
+      label: "Срок действия (дни)",
+      name: "validity_period",
+      typeElement: "input",
+      type: "number",
+    },
+    {
+      label: "Цена прихода",
+      name: "price_arrival",
+      typeElement: "input",
+      type: "number",
+      isRequired: true,
+    },
+    {
+      label: "Цена продажи",
+      name: "price_sell",
+      typeElement: "input",
+      type: "number",
+      isRequired: true,
+    },
+    {
+      label: "SKU ID",
+      name: "sku_id",
+      typeElement: "input",
+      isRequired: true,
+    },
+    {
+      label: "Кешбек (%)",
+      name: "cashback_percent",
+      typeElement: "input",
+      type: "number",
+    }, {
       label: "4G",
-      name: "tariff_4g",
-      typeElement: "checkbox",
-    },
-    {
-      label: "Скрыть с сайта",
-      name: "hide_site",
-      typeElement: "checkbox",
-    },
-    {
-      label: "B2B",
-      name: "b2b",
+      name: "is_4g",
       typeElement: "checkbox",
     },
     {
       label: "5G",
-      name: "tariff_5g",
+      name: "is_5g",
+      typeElement: "checkbox",
+    },
+    {
+      label: "Популярный",
+      name: "is_popular",
       typeElement: "checkbox",
     },
   ];
@@ -316,7 +252,7 @@ export default function TariffsForm({
     } = field;
     const value = formData[name] ?? "";
 
-    if (typeElement === "input" || typeElement === "textarea") {
+    if (typeElement === "input") {
       return (
         <Input
           value={value}
@@ -326,6 +262,54 @@ export default function TariffsForm({
           required={isRequired}
           type={type}
         />
+      );
+    }
+
+    if (typeElement === "textarea") {
+      return (
+        <textarea
+          value={value}
+          className={`w-[250px] rounded-[4px] border border-gray-300 p-2 min-h-[80px]`}
+          placeholder={label}
+          onChange={(e) => handleChange(name, e.target.value)}
+          required={isRequired}
+        />
+      );
+    }
+
+    if (typeElement === "select" && isMulti) {
+
+      return (
+        <MultiSelect
+          name={name}
+          divClassname="w-full"
+          searchable={isSearchable}
+          value={isLoading
+            ? []
+            : getSelectValue(
+              formData,
+              name,
+              isMulti,
+              options,
+              valueKey,
+              labelKey
+            )}
+          options={getSelectOptions(options, valueKey, labelKey) || []}
+          onChange={(e) => {
+            const selectedItems = e.target.value || [];
+            const selectedValue = selectedItems.map((item: any) => item.value);
+
+            setFormData((prev: any) => ({ ...prev, [name]: selectedValue }));
+          }}
+          placeholder="Выберите регионы..."
+          className="w-full max-w-[250px]"
+          isLoading={isLoading}
+          enableBackendSearch={true}
+          searchEndpoint="/region/admin"
+          searchParam="search"
+          searchDelay={500}
+        />
+
       );
     }
 
@@ -341,13 +325,13 @@ export default function TariffsForm({
             isLoading
               ? null
               : getSelectValue(
-                  formData,
-                  name,
-                  isMulti,
-                  options,
-                  valueKey,
-                  labelKey
-                )
+                formData,
+                name,
+                isMulti,
+                options,
+                valueKey,
+                labelKey
+              )
           }
           onChange={(selected) => {
             const selectedValue = isMulti
@@ -373,25 +357,28 @@ export default function TariffsForm({
         />
       );
     }
+
     if (typeElement === "checkbox") {
       return (
         <Checkbox
           id={name}
-          checked={name === "type_sim" ? value == "esim" : !!value}
+          checked={!!value}
           onCheckedChange={(checked) => handleChange(name, !!checked)}
           required={isRequired}
+          className=""
         />
       );
     }
     return null;
   };
+
   return (
-    <div className="w-full mx-auto my-0 px-4 py-2 overflow-auto">
-      <div className="grid grid-cols-1 w-full lg:grid-cols-[1fr_1fr_.5fr] md:grid-cols-2 gap-x-8 gap-y-3">
+    <div className="w-full mx-auto my-0 px-4 py-2">
+      <div className="grid grid-cols-1 w-full lg:grid-cols-[1fr_1fr_.5fr] md:grid-cols-2 gap-x-6 gap-y-3">
         {fields.map((field) => (
           <div
             key={field.name}
-            className="grid grid-cols-[150px_1fr] items-center"
+            className="flex flex-col gap-2"
           >
             <label
               htmlFor={field.name}

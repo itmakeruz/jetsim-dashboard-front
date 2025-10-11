@@ -7,23 +7,6 @@ export const authAPI = {
   getProfile: () => axios.get("/auth/me-staff"),
 };
 
-// Admin API - Exact match from api-data.json
-export const adminAPI = {
-  // Roles
-  getRoles: () => axios.get("/roles"),
-  createRole: (data) => axios.post("/roles", data),
-  getRoleById: (id) => axios.get(`/roles/${id}`),
-  updateRole: (id, data) => axios.put(`/roles/${id}`, data),
-  deleteRole: (id) => axios.delete(`/roles/${id}`),
-
-  // Permissions
-  getPermissions: () => axios.get("/permissions"),
-  createPermission: (data) => axios.post("/permissions", data),
-  getPermissionById: (id) => axios.get(`/permissions/${id}`),
-  updatePermission: (id, data) => axios.put(`/permissions/${id}`, data),
-  deletePermission: (id) => axios.delete(`/permissions/${id}`),
-};
-
 // Users API - Exact match from api-data.json
 export const usersAPI = {
   getUsers: () => axios.get("/users"),
@@ -36,21 +19,6 @@ export const usersAPI = {
     axios.post(`/users/${id}/assign-permissions`, data),
   manageUserBranches: (id, data) =>
     axios.post(`/users/${id}/manage-branches`, data),
-};
-
-// Regions API - Exact match from api-data.json
-export const regionsAPI = {
-  getRegions: () => axios.get("/regions"),
-  createRegion: (data) =>
-    axios.post("/regions", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
-  getRegionById: (id) => axios.get(`/regions/${id}`),
-  updateRegion: (id, data) =>
-    axios.put(`/regions/${id}`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
-  deleteRegion: (id) => axios.delete(`/regions/${id}`),
 };
 
 // Clients API - Exact match from api-data.json
@@ -71,23 +39,6 @@ export const clientsAPI = {
   createClientStatus: (data) => axios.post("/client-statuses", data),
   updateClientStatus: (id, data) => axios.put(`/client-statuses/${id}`, data),
   deleteClientStatus: (id) => axios.delete(`/client-statuses/${id}`),
-};
-
-// Products API - Exact match from api-data.json
-export const productsAPI = {
-  getProducts: (params) => axios.get("/products", { params }),
-  createProduct: (data) => axios.post("/products", data),
-  getProductById: (id) => axios.get(`/products/${id}`),
-  updateProduct: (id, data) => axios.put(`/products/${id}`, data),
-  deleteProduct: (id) => axios.delete(`/products/${id}`),
-};
-
-// Payment Types API - Exact match from api-data.json
-export const paymentTypesAPI = {
-  getPaymentTypes: () => axios.get("/payment-types"),
-  createPaymentType: (data) => axios.post("/payment-types", data),
-  updatePaymentType: (id, data) => axios.put(`/payment-types/${id}`, data),
-  deletePaymentType: (id) => axios.delete(`/payment-types/${id}`),
 };
 
 // Simcards API - Exact match from api-data.json
@@ -117,15 +68,6 @@ export const faqsAPI = {
   deleteFaq: (id) => axios.delete(`/faqs/${id}`),
 };
 
-// Product Orders API - Exact match from api-data.json
-export const productOrdersAPI = {
-  getProductOrders: (params) => axios.get("/product-orders", { params }),
-  createProductOrder: (data) => axios.post("/product-orders/create", data),
-  getProductOrderById: (id) => axios.get(`/product-orders/${id}`),
-  updateProductOrder: (id, data) => axios.put(`/product-orders/${id}`, data),
-  deleteProductOrder: (id) => axios.delete(`/product-orders/${id}`),
-};
-
 // Customer Orders API - Exact match from api-data.json
 export const customerOrdersAPI = {
   getCustomerOrders: () => axios.get("/customer/order-simcard/my-orders"),
@@ -146,48 +88,6 @@ export const simCardOrdersAPI = {
   processSimOrder: (data) => axios.post("/order-simcard/process", data),
   createAdditionalPlan: (orderId, data) =>
     axios.post(`/order-simcard/${orderId}/additional-plan`, data),
-};
-
-// Warehouse API - Based on inventory endpoints found in api-data.json
-export const warehouseAPI = {
-  // Inventory
-  getInventories: () => axios.get("/inventories"),
-  createInventory: (data) => axios.post("/inventories", data),
-  updateInventory: (id, data) => axios.put(`/inventories/${id}`, data),
-  deleteInventory: (id) => axios.delete(`/inventories/${id}`),
-  getInventoryProducts: (id, params) =>
-    axios.get(`/inventories/${id}/products`, { params }),
-  getInventoryStats: (id) => axios.get(`/inventories/${id}/stats`),
-  getMissingProducts: (id) => axios.get(`/inventories/${id}/missing-products`),
-  completeInventoryStep1: (id, data) =>
-    axios.post(`/inventories/${id}/complete-step1`, data),
-
-  // Transfers
-  getTransfers: () => axios.get("/transfers"),
-  createTransfer: (data) => axios.post("/transfers", data),
-  updateTransfer: (id, data) => axios.put(`/transfers/${id}`, data),
-  deleteTransfer: (id) => axios.delete(`/transfers/${id}`),
-  getTransferProducts: (branchId) =>
-    axios.get(`/transfers/branch/${branchId}/products`),
-
-  // Write-offs
-  getWriteOffs: () => axios.get("/write-offs"),
-  createWriteOff: (data) => axios.post("/write-offs", data),
-  updateWriteOff: (id, data) => axios.put(`/write-offs/${id}`, data),
-  deleteWriteOff: (id) => axios.delete(`/write-offs/${id}`),
-  getWriteOffProducts: (branchId) =>
-    axios.get(`/write-offs/branch/${branchId}/products`),
-
-  // Revaluations
-  getRevaluations: () => axios.get("/revaluations"),
-  createRevaluation: (data) => axios.post("/revaluations", data),
-  updateRevaluation: (id, data) => axios.put(`/revaluations/${id}`, data),
-  deleteRevaluation: (id) => axios.delete(`/revaluations/${id}`),
-  getRevaluationProducts: (id, params) =>
-    axios.get(`/revaluations/${id}/products`, { params }),
-  // Qo'shildi: Inventory statusni yakunlash
-  completeInventoryStatus: (id, data) =>
-    axios.put(`/inventories/${id}/status`, data),
 };
 
 // Dashboard API - Using inventory stats as alternative since no specific dashboard endpoints found
@@ -357,4 +257,16 @@ export const referenceAPI = {
   createSimCard: (data) => axios.post("/simcards", data),
   updateSimCard: (id, data) => axios.put(`/simcards/${id}`, data),
   deleteSimCard: (id) => axios.delete(`/simcards/${id}`),
+
+  // Tariffs
+  getTariffs: (params) => axios.get("/tariff/admin", { params }),
+  createTariff: (data) => axios.post("/tariff", data),
+  updateTariff: (id, data) => axios.patch(`/tariff/${id}`, data),
+  deleteTariff: (id) => axios.delete(`/tariff/${id}`),
+
+  // Partners
+  getPartners: (params) => axios.get("/partner", { params }),
+  createPartner: (data) => axios.post("/partner", data),
+  updatePartner: (id, data) => axios.patch(`/partner/${id}`, data),
+  deletePartner: (id) => axios.delete(`/partner/${id}`),
 };

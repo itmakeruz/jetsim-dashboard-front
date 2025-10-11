@@ -14,9 +14,8 @@ function UniversalModal({
 }) {
   return (
     <div
-      className={`fixed inset-0 z-[20] grid place-content-center ${
-        !isShow && "pointer-events-none"
-      }`}
+      className={`fixed inset-0 z-[20] grid place-content-center ${!isShow && "pointer-events-none"
+        }`}
     >
       {isShow && (
         <div
@@ -26,9 +25,8 @@ function UniversalModal({
       )}
 
       <div
-        className={`bg-white transition-all flex flex-col duration-200 z-[1] rounded main-shadow p-6 relative ${width} ${
-          isShow ? "scale-[1] opacity-[1]" : "scale-[0.6] opacity-0"
-        }`}
+        className={`bg-white transition-all flex flex-col duration-200 z-[1] rounded main-shadow p-6 relative ${width} ${isShow ? "scale-[1] opacity-[1]" : "scale-[0.6] opacity-0"
+          }`}
       >
         <div className="mb-6">
           {title && (

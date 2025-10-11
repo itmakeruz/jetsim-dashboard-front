@@ -6,15 +6,17 @@ function TariffsTbody({ datas, onEdit, className, onDelete }) {
     <>
       {datas.map((item, index) => (
         <div
-          key={index}
+          key={item.id || index}
           className={`grid w-full min-h-[36px] border-t border-[#E3E4E8] items-center gap-4 text-sm text-main-black font-medium ${className}`}
         >
           <span className="flex items-center justify-center">{index + 1}</span>
           <span className="flex items-center">
-            {item.name || "Название не указано"}
+            {item.name_ru || item.name_en || "Название не указано"}
           </span>
           <span className="flex items-center">
-            {item?.region_group?.name || "Название не указано"}
+            {item.regions?.length > 0
+              ? `${item.regions.length} регионов`
+              : "Регионы не указаны"}
           </span>
           <span className="flex items-center">
             {item.quantity_sms || 0} SMS

@@ -21,7 +21,7 @@ const CustomSelect = ({
   name,
   disabled = false,
   loading = false,
-}) => {
+}: any) => {
   return (
     <div className={`flex items-center justify-between gap-2 ${divClassname}`}>
       {label && <CustomLabel labelText={label} />}
@@ -36,9 +36,9 @@ const CustomSelect = ({
         disabled={disabled}
       >
         <SelectTrigger
-          className={`${className} !text-main-black text-sm capitalize cursor-pointer pr-2 !ring-0 shadow-none ${
-            required && isError ? "border-red-500" : ""
-          }`}
+          className={`${className} border w-full outline-none px-4 border-[rgb(116,120,141,0.35)] py-3 rounded text-sm 
+        max-w-[320px] 
+         `}
         >
           {loading ? (
             <SelectValue placeholder={"Загрузка..."} />
@@ -46,7 +46,7 @@ const CustomSelect = ({
             <SelectValue placeholder={placeholder || "Выбрать"} />
           )}
         </SelectTrigger>
-        <SelectContent className="shadow-none text-main-black bg-white border border-gray-200 focus:ring-0 focus:outline-none">
+        <SelectContent className="shadow-none text-main-black bg-white border border-[rgb(116,120,141,0.35)] rounded-none">
           {options?.map((option, index) => (
             <SelectItem
               className="cursor-pointer capitalize"
