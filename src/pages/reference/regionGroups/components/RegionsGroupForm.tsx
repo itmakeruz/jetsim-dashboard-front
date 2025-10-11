@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
 import CustomInput from "@/components/formElements/CustomInput";
-import { getImageUrl } from "@/utils/imageUtils";
 import { handleChange } from '@/utils/handleChange';
 import MultiSelect from "@/components/formElements/MultiSelect";
 import { referenceAPI } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import FormImgView from "@/components/FormImgView";
 function RegionsGroupForm({ formData, setFormData, editData }) {
   const [previewImage, setPreviewImage] = useState(null);
 
@@ -37,11 +37,9 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
   }, [formData?.regions, categoryOptions]);
 
   const handleCategoryChange = (e: any) => {
-    // e.target.value contains array of selected category objects
     const selectedItems = e.target.value || [];
-    // Extract only IDs to store in formData
-    const categoryIds = selectedItems.map((item: any) => item.id);
-    setFormData((prev: any) => ({ ...prev, region_category: categoryIds }));
+    const regionIds = selectedItems.map((item: any) => item.id);
+    setFormData((prev: any) => ({ ...prev, regions: regionIds }));
   };
   return (
     <>
@@ -66,7 +64,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
       <CustomInput
         onChange={handleChange(setFormData, setPreviewImage)}
         className="max-w-[320px]"
-        label="Иконка"
+        label="Флаг"
         placeholder="Выберите иконку"
         name="icon"
         type="file"
@@ -83,22 +81,19 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
         className="w-full max-w-[320px]"
         isLoading={isRegionsLoading}
         searchable={true}
-        isError={false}
-        setIsError={() => { }}
-        enableBackendSearch={false}
+        enableBackendSearch={true}
         divClassname="flex justify-between items-center"
+        searchEndpoint="/region/admin"
+        searchParam="search"
+        searchDelay={500}
       />
       {(previewImage || editData?.icon) && (
-        <div className="mt-2 ml-auto">
-          <img
-            className="w-12 h-12 object-cover rounded-lg border border-gray-300"
-            src={
-              previewImage ||
-              (editData?.icon ? getImageUrl(editData.icon) : null)
-            }
-            alt="Region group icon"
-          />
-        </div>
+        <FormImgView
+          previewImage={previewImage}
+          formData={formData}
+          editData={editData}
+          alt="Region group flag"
+        />
       )}
     </>
   );

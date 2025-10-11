@@ -294,6 +294,7 @@ export const settingsAPI = {
 
 // Legacy API exports for backward compatibility
 export const referenceAPI = {
+  get: (endpoint, params) => axios.get(endpoint, { params }),
   // Region Groups (Categories)
   getRegionGroups: (params) => axios.get("/region/admin/category", { params }),
   createRegionGroup: (data) =>
@@ -307,7 +308,7 @@ export const referenceAPI = {
   deleteRegionGroup: (id) => axios.delete(`/region/category/${id}`),
 
   // Regions
-  getRegions: (params) => axios.get("/region/admin", { params }),
+  getRegions: (params) => axios.get(`/region/admin`, { params }),
   createRegion: (data) =>
     axios.post("/region", data, {
       headers: { "Content-Type": "multipart/form-data" },

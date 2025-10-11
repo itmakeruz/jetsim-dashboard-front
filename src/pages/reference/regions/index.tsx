@@ -1,5 +1,5 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { showToast } from "@/utils/toastHelper";
@@ -15,14 +15,14 @@ import { regionsTableHeadItems } from "@/constants/tableHeadNames";
 import RegionsForm from "./components/RegionsForm";
 import RegionsTbody from "./components/RegionsTbody";
 import Loader from "@/components/Loader";
-import { size } from "@/constants/paginationStuffs";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { referenceAPI } from "@/lib/api";
+import CustomInput from "@/components/formElements/CustomInput";
 
 function Regions() {
   const queryClient = useQueryClient();
   const [debouncedSearch, setDebouncedSearch] = useState("");
-
+  const [searchValue, setSearchValue] = useState("");
   const [isShow, setIsShow] = useState(false);
   const [formData, setFormData] = useState({
     name_ru: "",
@@ -36,7 +36,6 @@ function Regions() {
   const isEditMode = modalType === "edit";
   const [searchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get("page")) || 1;
-  const pageSize = size;
 
   // Fetch regions with TanStack Query
   const {
@@ -138,6 +137,14 @@ function Regions() {
     }
   };
 
+  // Debounce search input
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearch(searchValue);
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [searchValue]);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-4 items-center">
@@ -151,6 +158,20 @@ function Regions() {
         >
           Добавить регион
         </UniversalBtn>
+        <div className="w-full flex items-center bg-white max-w-[520px]">
+          <span className="pl-1">
+            <Search className="text-xs text-[#74788D]" />
+          </span>
+          <CustomInput
+            divClassname="w-full"
+            className="w-full bg-white !border-0"
+            placeholder="Поиск"
+            name="search"
+            type="text"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </div>
       </div>
 
       {isShow && (

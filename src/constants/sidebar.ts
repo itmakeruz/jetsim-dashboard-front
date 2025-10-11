@@ -31,14 +31,14 @@ const adminMenu = [
     icon: Building2,
     children: [
       {
-        path: "/reference-tables/region-groups",
-        label: "Регион группы",
-        icon: Globe,
-      },
-      {
         path: "/reference-tables/regions",
         label: "Регионы",
         icon: Building2,
+      },
+      {
+        path: "/reference-tables/region-groups",
+        label: "Регион группы",
+        icon: Globe,
       },
     ],
   },

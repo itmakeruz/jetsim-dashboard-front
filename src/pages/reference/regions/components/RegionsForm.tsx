@@ -1,8 +1,8 @@
 import { useState } from "react";
 import CustomInput from "@/components/formElements/CustomInput";
-import { getImageUrl } from "@/utils/imageUtils";
 
 import { handleChange } from './../../../../utils/handleChange';
+import FormImgView from "@/components/FormImgView";
 
 interface RegionsFormProps {
   formData: any;
@@ -45,18 +45,12 @@ function RegionsForm({ formData, setFormData, editData }: RegionsFormProps) {
       />
 
       {(previewImage || formData?.image || editData?.image) && (
-        <div className="mt-2">
-          <img
-            className="w-16 h-16 object-cover rounded-lg border border-gray-300"
-            src={
-              previewImage ||
-              (typeof (formData?.image || editData?.image) === "string"
-                ? getImageUrl(formData?.image || editData?.image)
-                : null)
-            }
-            alt="Region image"
-          />
-        </div>
+        <FormImgView
+          previewImage={previewImage}
+          formData={formData}
+          editData={editData}
+          alt="Region image"
+        />
       )}
     </>
   );

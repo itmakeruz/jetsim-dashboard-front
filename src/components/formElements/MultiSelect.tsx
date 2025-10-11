@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronDown, X, Search } from "lucide-react";
 import CustomLabel from "./CustomLabel";
-import { useApi } from "@/hooks/useApi";
 import { useQuery } from "@tanstack/react-query";
 import { referenceAPI } from "@/lib/api";
 
@@ -12,16 +11,13 @@ const MultiSelect = ({
   onChange,
   className = "",
   divClassname = "",
-  required = false,
-  isError,
-  setIsError,
   label,
   name,
   isLoading = false,
   searchable = true,
   // New props for backend search
   searchEndpoint = null,
-  searchParam = "ssid",
+  searchParam = "",
   searchDelay = 500,
   enableBackendSearch = false,
 }) => {
@@ -37,17 +33,16 @@ const MultiSelect = ({
     isLoading: isSearching,
     error: searchError,
   } = useQuery({
-    queryKey: ["regions", debouncedSearchTerm],
-    queryFn: () => referenceAPI.getRegions({
-      search: debouncedSearchTerm.trim(),
-      endpoint: `${searchEndpoint}?${searchParam}=${debouncedSearchTerm.trim()}`,
+    queryKey: [searchEndpoint, debouncedSearchTerm],
+    queryFn: () => referenceAPI.get(searchEndpoint, {
+      [searchParam]: debouncedSearchTerm.trim(),
     }),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     enabled: shouldFetch,
   });
 
-
+  const datas = searchResults?.data || [];
 
   // Debounce search term for backend API calls
   useEffect(() => {
@@ -80,9 +75,13 @@ const MultiSelect = ({
         // Show error state - return empty array
         return [];
       }
-      if (searchResults?.data) {
+      if (datas?.data) {
         // Use backend search results
-        return searchResults.data;
+        return datas.data.map((item) => ({
+          id: item.id,
+          label: item.name_ru || item.name_en || `Category ${item.id}`,
+          name: item.name_ru || item.name_en || `Category ${item.id}`,
+        }));
       }
       // Still loading or no results yet
       return [];
@@ -100,13 +99,14 @@ const MultiSelect = ({
   }, [
     enableBackendSearch,
     debouncedSearchTerm,
-    searchResults,
+    datas,
     searchError,
     options,
     searchTerm,
   ]);
 
   const filteredOptions = getDisplayOptions();
+  console.log(filteredOptions);
 
   const handleToggleItem = (item) => {
     const isSelected = selectedItems.some(
@@ -125,9 +125,6 @@ const MultiSelect = ({
     setSelectedItems(newSelectedItems);
     onChange({ target: { name, value: newSelectedItems } });
 
-    if (setIsError) {
-      setIsError(false);
-    }
   };
 
   const handleRemoveItem = (itemToRemove) => {
@@ -206,8 +203,7 @@ const MultiSelect = ({
                 </div>
               </div>
             )}
-
-            <div className="max-h-48 overflow-y-auto">
+            <div className="max-h-48 pb-2 overflow-y-auto">
               {isLoading || isSearching ? (
                 <div className="p-4 text-center text-gray-500">
                   Yuklanmoqda...
@@ -220,9 +216,7 @@ const MultiSelect = ({
                 </div>
               ) : filteredOptions.length === 0 ? (
                 <div className="p-4 text-center text-gray-500">
-                  {enableBackendSearch && debouncedSearchTerm.trim()
-                    ? "Natija topilmadi"
-                    : "Natija topilmadi"}
+                  Natija topilmadi
                 </div>
               ) : (
                 filteredOptions.map((option, index) => {

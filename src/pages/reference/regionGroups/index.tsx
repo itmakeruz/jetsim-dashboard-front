@@ -26,6 +26,7 @@ function RegionsGroup() {
     name_ru: "",
     name_en: "",
     icon: null as File | null,
+    regions: [],
   });
   const [selectedData, setSelectedData] = useState<any>(null);
   const [modalType, setModalType] = useState("");
@@ -98,6 +99,7 @@ function RegionsGroup() {
       name_ru: "",
       name_en: "",
       icon: null,
+      regions: [],
     });
     setModalType("");
     setSelectedData(null);
@@ -110,6 +112,9 @@ function RegionsGroup() {
     const formDataToSend = new FormData();
     formDataToSend.append("name_ru", formData.name_ru);
     formDataToSend.append("name_en", formData.name_en);
+    // region array
+    formDataToSend.append("regions", JSON.stringify(formData.regions));
+
 
     if (formData.icon) {
       formDataToSend.append("icon", formData.icon);
@@ -217,14 +222,14 @@ function RegionsGroup() {
           <div className="bg-white rounded shadow p-4 h-full overflow-hidden">
             <UniversalTable
               tableHeadItems={regionGroupsTableHeadItems}
-              className="grid-cols-[50px_100px_1fr_1fr_1fr_.1fr]"
+              className="grid-cols-[50px_100px_1fr_1fr_1fr_.5fr]"
             >
               <RegionsGroupTbody
-                className="grid-cols-[50px_100px_1fr_1fr_1fr_.1fr]"
+                className="grid-cols-[50px_100px_1fr_1fr_1fr_.5fr]"
                 datas={datas}
                 onEdit={(item) => {
                   setSelectedData(item);
-                  setFormData(item);
+                  setFormData({ ...item, regions: item.regions.map((region: any) => region.id) });
                   setModalType("edit");
                   setIsShow(true);
                 }}
