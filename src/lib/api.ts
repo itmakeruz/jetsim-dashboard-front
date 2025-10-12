@@ -146,6 +146,9 @@ export const otherAPI = {
 };
 
 export const ordersAPI = {
+  // Admin Orders
+  getOrders: (params) => axios.get("/order/admin", { params }),
+
   // Product Orders
   getProductOrders: (params) => axios.get("/product-orders", { params }),
   createProductOrder: (data) => axios.post("/product-orders/create", data),

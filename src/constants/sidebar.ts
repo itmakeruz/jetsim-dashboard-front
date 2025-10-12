@@ -5,8 +5,6 @@ import {
   Globe,
   ClipboardList,
   List,
-  Check,
-  X,
   Settings,
   CircleHelp,
   Newspaper,
@@ -48,12 +46,9 @@ const adminMenu = [
     icon: ClipboardList,
   },
   {
+    path: "/orders",
     label: "Заказы",
     icon: List,
-    children: [
-      { path: "/orders/active", label: "Активные заказы", icon: Check },
-      { path: "/orders/cancelled", label: "Отмененные", icon: X },
-    ],
   },
   {
     label: "Сайт",

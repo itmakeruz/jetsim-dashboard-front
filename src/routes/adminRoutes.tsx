@@ -7,10 +7,7 @@ import Regions from "../pages/reference/regions";
 import RegionGroups from "../pages/reference/regionGroups";
 
 // Заказы
-import OrdersLayout from "../pages/orders/index";
-import OrdersCancelled from "../pages/orders/cancelled";
-import OrdersActive from "../pages/orders/active";
-import OrderViewPage from "../pages/orders/OrderViewPage";
+import Orders from "../pages/orders/index";
 
 // Сайт
 import SiteLayout from "../pages/site/index";
@@ -45,15 +42,7 @@ const adminRoutes = [
   },
 
   // Заказы
-  {
-    path: "/orders",
-    element: <OrdersLayout />,
-    children: [
-      { path: "cancelled", element: <OrdersCancelled /> },
-      { path: "active", element: <OrdersActive /> },
-      { path: "view/:orderId", element: <OrderViewPage /> },
-    ],
-  },
+  { path: "/orders", element: <Orders /> },
 
   // Сайт
   {

@@ -12,7 +12,7 @@ function FormImgView({ previewImage, formData, editData, alt }: FormImgType) {
     return (
         <div className="mt-2">
             <img
-                className="w-20 h-16 object-cover rounded border border-gray-300"
+                className="w-20 h-auto object-cover rounded border border-gray-300"
                 src={
                     previewImage ||
                     (typeof (formData?.image || editData?.image || editData?.icon) === "string"
