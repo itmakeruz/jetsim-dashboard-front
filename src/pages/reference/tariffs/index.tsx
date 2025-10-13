@@ -53,15 +53,13 @@ function Tariffs() {
   const currentPage = parseInt(searchParams.get("page")) || 1;
 
   // Fetch tariffs with TanStack Query
-  const {
-    data: response,
-    isLoading,
-  } = useQuery({
+  const { data: response, isLoading } = useQuery({
     queryKey: ["tariffs", currentPage, debouncedSearch],
-    queryFn: () => referenceAPI.getTariffs({
-      page: currentPage,
-      search: debouncedSearch || undefined,
-    }),
+    queryFn: () =>
+      referenceAPI.getTariffs({
+        page: currentPage,
+        search: debouncedSearch || undefined,
+      }),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
@@ -78,7 +76,9 @@ function Tariffs() {
       closeModal();
     },
     onError: (error: any) => {
-      showToast.error(error?.response?.data?.message || "Произошла ошибка при создании тарифа");
+      showToast.error(
+        error?.response?.data?.message || "Произошла ошибка при создании тарифа"
+      );
     },
   });
 
@@ -92,7 +92,10 @@ function Tariffs() {
       closeModal();
     },
     onError: (error: any) => {
-      showToast.error(error?.response?.data?.message || "Произошла ошибка при обновлении тарифа");
+      showToast.error(
+        error?.response?.data?.message ||
+          "Произошла ошибка при обновлении тарифа"
+      );
     },
   });
 
@@ -105,7 +108,9 @@ function Tariffs() {
       closeModal();
     },
     onError: (error: any) => {
-      showToast.error(error?.response?.data?.message || "Произошла ошибка при удалении тарифа");
+      showToast.error(
+        error?.response?.data?.message || "Произошла ошибка при удалении тарифа"
+      );
     },
   });
 
@@ -273,7 +278,9 @@ function Tariffs() {
                   setSelectedData(item);
                   setFormData({
                     ...item,
-                    region_ids: item.regions?.map((region: any) => region.id) || [],
+                    region_ids:
+                      item.regions?.map((region: any) => region.id) || [],
+                    partner_id: item.partner?.id || null,
                   });
                   setModalType("edit");
                   setIsShow(true);

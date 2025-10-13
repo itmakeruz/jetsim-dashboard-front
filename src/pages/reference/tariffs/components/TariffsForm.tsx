@@ -61,6 +61,8 @@ const getSelectValue = (
   }
 
   const opt = options.find((o) => o[valueKey] === rawValue);
+  console.log(opt);
+
   return opt ? { value: rawValue, label: opt[labelKey] } : null;
 };
 
@@ -131,12 +133,14 @@ export default function TariffsForm({
       name: "quantity_sms",
       typeElement: "input",
       type: "number",
-    }, {
+    },
+    {
       label: "Название (EN)",
       name: "name_en",
       typeElement: "input",
       isRequired: true,
-    }, {
+    },
+    {
       label: "Регионы",
       name: "region_ids",
       typeElement: "select",
@@ -146,7 +150,8 @@ export default function TariffsForm({
       isMulti: true,
       isSearchable: true,
       isRequired: false,
-    }, {
+    },
+    {
       label: "Количество минут",
       name: "quantity_minute",
       typeElement: "input",
@@ -166,7 +171,8 @@ export default function TariffsForm({
       valueKey: "id",
       labelKey: "name_ru",
       isRequired: true,
-    }, {
+    },
+    {
       label: "Количество интернет (GB)",
       name: "quantity_internet",
       typeElement: "input",
@@ -218,7 +224,8 @@ export default function TariffsForm({
       name: "cashback_percent",
       typeElement: "input",
       type: "number",
-    }, {
+    },
+    {
       label: "4G",
       name: "is_4g",
       typeElement: "checkbox",
@@ -278,22 +285,23 @@ export default function TariffsForm({
     }
 
     if (typeElement === "select" && isMulti) {
-
       return (
         <MultiSelect
           name={name}
           divClassname="w-full"
           searchable={isSearchable}
-          value={isLoading
-            ? []
-            : getSelectValue(
-              formData,
-              name,
-              isMulti,
-              options,
-              valueKey,
-              labelKey
-            )}
+          value={
+            isLoading
+              ? []
+              : getSelectValue(
+                  formData,
+                  name,
+                  isMulti,
+                  options,
+                  valueKey,
+                  labelKey
+                )
+          }
           options={getSelectOptions(options, valueKey, labelKey) || []}
           onChange={(e) => {
             const selectedItems = e.target.value || [];
@@ -309,7 +317,6 @@ export default function TariffsForm({
           searchParam="search"
           searchDelay={500}
         />
-
       );
     }
 
@@ -325,13 +332,13 @@ export default function TariffsForm({
             isLoading
               ? null
               : getSelectValue(
-                formData,
-                name,
-                isMulti,
-                options,
-                valueKey,
-                labelKey
-              )
+                  formData,
+                  name,
+                  isMulti,
+                  options,
+                  valueKey,
+                  labelKey
+                )
           }
           onChange={(selected) => {
             const selectedValue = isMulti
@@ -376,10 +383,7 @@ export default function TariffsForm({
     <div className="w-full mx-auto my-0 px-4 py-2">
       <div className="grid grid-cols-1 w-full lg:grid-cols-[1fr_1fr_.5fr] md:grid-cols-2 gap-x-6 gap-y-3">
         {fields.map((field) => (
-          <div
-            key={field.name}
-            className="flex flex-col gap-2"
-          >
+          <div key={field.name} className="flex flex-col gap-2">
             <label
               htmlFor={field.name}
               className="text-sm font-medium cursor-pointer select-none"
