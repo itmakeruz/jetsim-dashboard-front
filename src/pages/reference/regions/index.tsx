@@ -38,15 +38,10 @@ function Regions() {
   const currentPage = parseInt(searchParams.get("page")) || 1;
 
   // Fetch regions with TanStack Query
-  const {
-    data: response,
-    isLoading,
-  } = useQuery({
+  const { data: response, isLoading } = useQuery({
     queryKey: ["regions", currentPage, debouncedSearch],
-    queryFn: () => referenceAPI.getRegions({
-      page: currentPage,
-      search: debouncedSearch || undefined,
-    }),
+    queryFn: () =>
+      referenceAPI.getRegions(debouncedSearch || null, currentPage),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
@@ -120,7 +115,10 @@ function Regions() {
       }
 
       if (isEditMode) {
-        await updateMutation.mutateAsync({ id: selectedData.id, data: formDataToSend });
+        await updateMutation.mutateAsync({
+          id: selectedData.id,
+          data: formDataToSend,
+        });
       } else {
         await createMutation.mutateAsync(formDataToSend);
       }
@@ -229,18 +227,18 @@ function Regions() {
                 }}
               />
             </UniversalTable>
-
-
           </div>
         ) : (
           <EmptyDatas />
         )}
-        <PaginationComp
-          current={meta.currentPage || currentPage}
-          total={meta.totalItems || 0}
-          totalPages={meta.totalPage || 1}
-          limit={meta.totalSize || 20}
-        />
+        {!isLoading && (
+          <PaginationComp
+            current={meta.currentPage || currentPage}
+            total={meta.totalItems || 0}
+            totalPages={meta.totalPage || 1}
+            limit={meta.totalSize || 20}
+          />
+        )}
       </div>
     </div>
   );

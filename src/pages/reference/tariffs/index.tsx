@@ -56,10 +56,7 @@ function Tariffs() {
   const { data: response, isLoading } = useQuery({
     queryKey: ["tariffs", currentPage, debouncedSearch],
     queryFn: () =>
-      referenceAPI.getTariffs({
-        page: currentPage,
-        search: debouncedSearch || undefined,
-      }),
+      referenceAPI.getTariffs(debouncedSearch || null, currentPage),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });

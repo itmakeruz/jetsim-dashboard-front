@@ -7,41 +7,43 @@ import { showToast } from "@/utils/toastHelper";
 import { referenceAPI } from "@/lib/api";
 
 import UniversalBtn from "@/components/buttons/UniversalBtn";
+import CustomInput from "@/components/formElements/CustomInput";
 import UniversalModal from "@/components/modals/UniversalModal";
 import UniversalDeleteModal from "@/components/modals/UniversalDeleteModal";
 import UniversalTable from "@/components/tables/UniversalTables";
 import EmptyDatas from "@/components/empty/EmptyDatas";
 import PaginationComp from "@/components/paginations/PaginationComp";
 
-import { regionGroupsTableHeadItems } from "@/constants/tableHeadNames";
-import RegionsGroupForm from "./components/RegionsGroupForm";
-import RegionsGroupTbody from "./components/RegionsGroupTbody";
-import CustomInput from "@/components/formElements/CustomInput";
+import { tariffsTypesTableHeadItems } from "@/constants/tableHeadNames";
+import TariffsTypesForm from "./components/TariffsTypesForm";
+import TariffsTypesTbody from "./components/TariffsTypesTbody";
 import Loader from "@/components/Loader";
 
-function RegionsGroup() {
+function TariffsTypes() {
   const queryClient = useQueryClient();
   const [isShow, setIsShow] = useState(false);
   const [formData, setFormData] = useState({
     name_ru: "",
     name_en: "",
-    icon: null as File | null,
-    regions: [],
+    status: "ACTIVE",
   });
   const [selectedData, setSelectedData] = useState<any>(null);
   const [modalType, setModalType] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const isEditMode = modalType === "edit";
-  const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get("page")) || 1;
 
-  // Fetch region groups with TanStack Query
+  // Fetch tariff types with TanStack Query
   const { data: response, isLoading } = useQuery({
-    queryKey: ["regionGroups", currentPage, debouncedSearch],
+    queryKey: ["tariffTypes", currentPage, debouncedSearch],
     queryFn: () =>
-      referenceAPI.getRegionGroups(debouncedSearch || null, currentPage),
+      referenceAPI.getTariffTypes({
+        page: currentPage,
+        search: debouncedSearch || undefined,
+      }),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
@@ -51,52 +53,55 @@ function RegionsGroup() {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: (data: FormData) => referenceAPI.createRegionGroup(data),
+    mutationFn: (data: any) => referenceAPI.createTariffType(data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["tariffTypes"] });
       showToast.success(
-        response?.data?.message || "Группа регионов успешно создана!"
-      );
-      closeModal();
-    },
-    onError: (error: any) => {
-      showToast.error(
-        error?.response?.data?.message || "Произошла ошибка при создании группы"
-      );
-    },
-  });
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: FormData }) =>
-      referenceAPI.updateRegionGroup(id, data),
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
-      showToast.success(
-        response?.data?.message || "Группа регионов успешно обновлена!"
+        response?.data?.message || "Тип тарифа успешно создан!"
       );
       closeModal();
     },
     onError: (error: any) => {
       showToast.error(
         error?.response?.data?.message ||
-          "Произошла ошибка при обновлении группы"
+          "Произошла ошибка при создании типа тарифа"
       );
     },
   });
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => referenceAPI.deleteRegionGroup(id),
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) =>
+      referenceAPI.updateTariffType(id, data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
+      queryClient.invalidateQueries({ queryKey: ["tariffTypes"] });
       showToast.success(
-        response?.data?.message || "Группа регионов успешно удалена!"
+        response?.data?.message || "Тип тарифа успешно обновлен!"
       );
       closeModal();
     },
     onError: (error: any) => {
       showToast.error(
-        error?.response?.data?.message || "Произошла ошибка при удалении группы"
+        error?.response?.data?.message ||
+          "Произошла ошибка при обновлении типа тарифа"
+      );
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => referenceAPI.deleteTariffType(id),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["tariffTypes"] });
+      showToast.success(
+        response?.data?.message || "Тип тарифа успешно удален!"
+      );
+      closeModal();
+    },
+    onError: (error: any) => {
+      showToast.error(
+        error?.response?.data?.message ||
+          "Произошла ошибка при удалении типа тарифа"
       );
     },
   });
@@ -106,8 +111,7 @@ function RegionsGroup() {
     setFormData({
       name_ru: "",
       name_en: "",
-      icon: null,
-      regions: [],
+      status: "ACTIVE",
     });
     setModalType("");
     setSelectedData(null);
@@ -116,25 +120,21 @@ function RegionsGroup() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    // Prepare FormData
-    const formDataToSend = new FormData();
-    formDataToSend.append("name_ru", formData.name_ru);
-    formDataToSend.append("name_en", formData.name_en);
-    // region array
-    formDataToSend.append("regions", JSON.stringify(formData.regions));
-
-    if (formData.icon) {
-      formDataToSend.append("icon", formData.icon);
-    }
+    // Prepare data for submission
+    const dataToSend = {
+      name_ru: formData.name_ru,
+      name_en: formData.name_en,
+      status: formData.status,
+    };
 
     try {
       if (isEditMode) {
         await updateMutation.mutateAsync({
           id: selectedData.id,
-          data: formDataToSend,
+          data: dataToSend,
         });
       } else {
-        await createMutation.mutateAsync(formDataToSend);
+        await createMutation.mutateAsync(dataToSend);
       }
     } catch (error) {
       // Error handling is done in mutation callbacks
@@ -157,6 +157,15 @@ function RegionsGroup() {
     return () => clearTimeout(timeoutId);
   }, [searchValue]);
 
+  // Update URL when debounced search changes
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    else params.delete("search");
+    params.set("page", "1");
+    setSearchParams(params, { replace: true });
+  }, [debouncedSearch]);
+
   return (
     <div className="flex flex-col gap-4 h-full">
       <div className="flex gap-4 items-center">
@@ -168,7 +177,7 @@ function RegionsGroup() {
           }}
           icon={Plus}
         >
-          Добавить регион группу
+          Добавить тип тарифа
         </UniversalBtn>
 
         <div className="w-full flex items-center bg-white max-w-[520px]">
@@ -190,15 +199,13 @@ function RegionsGroup() {
       {isShow && (
         <UniversalModal
           isShow={isShow}
-          title={
-            isEditMode ? "Изменить регион группу" : "Добавить регион группу"
-          }
+          title={isEditMode ? "Изменить тип тарифа" : "Добавить тип тарифа"}
           btnText={isEditMode ? "Изменить" : "Добавить"}
           onClose={closeModal}
           onSubmit={handleSubmit}
           loading={createMutation.isPending || updateMutation.isPending}
         >
-          <RegionsGroupForm
+          <TariffsTypesForm
             editData={selectedData}
             formData={formData}
             setFormData={setFormData}
@@ -221,17 +228,18 @@ function RegionsGroup() {
         ) : datas?.length > 0 ? (
           <div className="bg-white rounded shadow p-4 h-full overflow-hidden">
             <UniversalTable
-              tableHeadItems={regionGroupsTableHeadItems}
-              className="grid-cols-[50px_100px_1fr_1fr_1fr_.5fr]"
+              tableHeadItems={tariffsTypesTableHeadItems}
+              className="grid-cols-[80px_1fr_1fr_120px_auto]"
             >
-              <RegionsGroupTbody
-                className="grid-cols-[50px_100px_1fr_1fr_1fr_.5fr]"
+              <TariffsTypesTbody
+                className="grid-cols-[80px_1fr_1fr_120px_auto]"
                 datas={datas}
                 onEdit={(item) => {
                   setSelectedData(item);
                   setFormData({
-                    ...item,
-                    regions: item.regions.map((region: any) => region.id),
+                    name_ru: item.name_ru || "",
+                    name_en: item.name_en || "",
+                    status: item.status || "ACTIVE",
                   });
                   setModalType("edit");
                   setIsShow(true);
@@ -257,4 +265,4 @@ function RegionsGroup() {
   );
 }
 
-export default RegionsGroup;
+export default TariffsTypes;

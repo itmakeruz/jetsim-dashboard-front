@@ -5,6 +5,7 @@ import ReferenceLayout from "./../pages/reference/index";
 import Tariffs from "../pages/reference/tariffs";
 import Regions from "../pages/reference/regions";
 import RegionGroups from "../pages/reference/regionGroups";
+import TariffsTypes from "../pages/reference/tariffsTypes";
 
 // Заказы
 import Orders from "../pages/orders/index";
@@ -17,7 +18,6 @@ import NewsSingle from "@/pages/site/news/pages/NewsSingle";
 import FaqSingle from "@/pages/site/faq/pages/FaqSingle";
 
 // Настройки
-import SettingsLayout from "../pages/settings/index";
 import Transactions from "../pages/settings/transactions";
 
 // Partners and Users
@@ -31,15 +31,11 @@ const adminRoutes = [
   { path: "/partners", element: <Partners /> },
 
   // Справочные таблицы
-  {
-    path: "/reference-tables",
-    element: <ReferenceLayout />,
-    children: [
-      { path: "tariffs", element: <Tariffs /> },
-      { path: "regions", element: <Regions /> },
-      { path: "region-groups", element: <RegionGroups /> },
-    ],
-  },
+
+  { path: "/tariffs", element: <Tariffs /> },
+  { path: "/tariff-types", element: <TariffsTypes /> },
+  { path: "regions", element: <Regions /> },
+  { path: "region-groups", element: <RegionGroups /> },
 
   // Заказы
   { path: "/orders", element: <Orders /> },
@@ -57,11 +53,7 @@ const adminRoutes = [
   },
 
   // Настройки
-  {
-    path: "/settings",
-    element: <SettingsLayout />,
-    children: [{ path: "/settings/transactions", element: <Transactions /> }],
-  },
+  { path: "/transactions", element: <Transactions /> },
 ];
 
 export default adminRoutes;

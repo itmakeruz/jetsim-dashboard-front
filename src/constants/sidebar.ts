@@ -21,7 +21,7 @@ const adminMenu = [
   },
   {
     label: "Транзакции",
-    path: "/settings/transactions",
+    path: "/transactions",
     icon: FaMoneyBillTransfer,
   },
   {
@@ -29,21 +29,32 @@ const adminMenu = [
     icon: Building2,
     children: [
       {
-        path: "/reference-tables/regions",
+        path: "/regions",
         label: "Регионы",
         icon: Building2,
       },
       {
-        path: "/reference-tables/region-groups",
+        path: "/region-groups",
         label: "Регион группы",
         icon: Globe,
       },
     ],
   },
   {
-    path: "/reference-tables/tariffs",
     label: "Тарифы",
     icon: ClipboardList,
+    children: [
+      {
+        path: "/tariffs",
+        label: "Тарифы",
+        icon: ClipboardList,
+      },
+      {
+        path: "/tariff-types",
+        label: "Типы тарифов",
+        icon: List,
+      },
+    ],
   },
   {
     path: "/orders",

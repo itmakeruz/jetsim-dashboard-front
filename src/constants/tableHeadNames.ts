@@ -46,3 +46,11 @@ export const transactionsTableHeadItems = [
   "Сообщение",
   "Дата",
 ];
+
+export const tariffsTypesTableHeadItems = [
+  "ID",
+  "Название (RU)",
+  "Название (EN)",
+  "Статус",
+  "Действие",
+];
