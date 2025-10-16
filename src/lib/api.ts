@@ -99,7 +99,7 @@ export const referenceAPI = {
   deleteRegionGroup: (id) => axios.delete(`/region/category/${id}`),
 
   // Regions
-  getRegions: (search: string | null, page: number = 1) => {
+  getRegions: (search?: string | null, page: number = 1) => {
     const params: {
       search?: string | null;
       page?: number;
@@ -137,23 +137,19 @@ export const referenceAPI = {
   deleteTariff: (id) => axios.delete(`/tariff/${id}`),
 
   // Tariff Types
-  getTariffTypes: (search: string | null, page: number = 1) => {
-    const params: {
-      search?: string | null;
-      page?: number;
-    } = {};
-
-    if (search) params.search = search;
-    if (page > 1) params.page = page;
-    return axios.get("/tariff/type/admin", { params });
+  getTariffTypes: () => {
+    return axios.get("/statics/tariff-type");
   },
-  createTariffType: (data) => axios.post("/tariff/type", data),
-  updateTariffType: (id, data) => axios.patch(`/tariff/type/${id}`, data),
-  deleteTariffType: (id) => axios.delete(`/tariff/type/${id}`),
+  createTariffType: (data) => axios.post("/statics/tariff-type", data),
+  updateTariffType: (id, data) => axios.put(`/statics/tariff-type/${id}`, data),
+  deleteTariffType: (id) => axios.delete(`/statics/tariff-type/${id}`),
 
   // Partners
   getPartners: (params) => axios.get("/partner", { params }),
   createPartner: (data) => axios.post("/partner", data),
   updatePartner: (id, data) => axios.patch(`/partner/${id}`, data),
   deletePartner: (id) => axios.delete(`/partner/${id}`),
+
+  // Users
+  getUsers: () => axios.get("/users"),
 };

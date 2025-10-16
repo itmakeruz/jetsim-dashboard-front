@@ -41,7 +41,7 @@ function Tariffs() {
     is_popular: false,
     is_4g: false,
     is_5g: false,
-    type: "TURBO",
+    type: null, // Changed to null to store tariff type ID
   });
   const [selectedData, setSelectedData] = useState<any>(null);
   const [modalType, setModalType] = useState("");
@@ -132,7 +132,7 @@ function Tariffs() {
       is_popular: false,
       is_4g: false,
       is_5g: false,
-      type: "TURBO",
+      type: null,
     });
     setModalType("");
     setSelectedData(null);
@@ -161,7 +161,7 @@ function Tariffs() {
       is_popular: formData.is_popular,
       is_4g: formData.is_4g,
       is_5g: formData.is_5g,
-      type: formData.type,
+      type: Number(formData.type), // Ensure type is sent as number (tariff type ID)
     };
 
     try {
@@ -278,6 +278,7 @@ function Tariffs() {
                     region_ids:
                       item.regions?.map((region: any) => region.id) || [],
                     partner_id: item.partner?.id || null,
+                    type: item.tariff_type?.id || item.type || null,
                   });
                   setModalType("edit");
                   setIsShow(true);

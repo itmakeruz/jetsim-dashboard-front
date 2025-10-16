@@ -25,7 +25,6 @@ function TariffsTypes() {
   const [formData, setFormData] = useState({
     name_ru: "",
     name_en: "",
-    status: "ACTIVE",
   });
   const [selectedData, setSelectedData] = useState<any>(null);
   const [modalType, setModalType] = useState("");
@@ -38,18 +37,37 @@ function TariffsTypes() {
 
   // Fetch tariff types with TanStack Query
   const { data: response, isLoading } = useQuery({
-    queryKey: ["tariffTypes", currentPage, debouncedSearch],
-    queryFn: () =>
-      referenceAPI.getTariffTypes({
-        page: currentPage,
-        search: debouncedSearch || undefined,
-      }),
+    queryKey: ["tariffTypes"],
+    queryFn: () => referenceAPI.getTariffTypes(),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
 
-  const datas = response?.data?.data || [];
-  const meta = response?.data?.meta || {};
+  const allDatas = response?.data?.data || [];
+
+  // Filter data based on search
+  const filteredDatas = allDatas.filter((item: any) => {
+    if (!debouncedSearch) return true;
+    const searchLower = debouncedSearch.toLowerCase();
+    return (
+      item.name_ru?.toLowerCase().includes(searchLower) ||
+      item.name_en?.toLowerCase().includes(searchLower) ||
+      item.identification_number?.toString().includes(searchLower)
+    );
+  });
+
+  // Paginate filtered data
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(filteredDatas.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const datas = filteredDatas.slice(startIndex, startIndex + itemsPerPage);
+
+  const meta = {
+    currentPage,
+    totalItems: filteredDatas.length,
+    totalPage: totalPages,
+    totalSize: itemsPerPage,
+  };
 
   // Create mutation
   const createMutation = useMutation({
@@ -111,7 +129,6 @@ function TariffsTypes() {
     setFormData({
       name_ru: "",
       name_en: "",
-      status: "ACTIVE",
     });
     setModalType("");
     setSelectedData(null);
@@ -124,7 +141,6 @@ function TariffsTypes() {
     const dataToSend = {
       name_ru: formData.name_ru,
       name_en: formData.name_en,
-      status: formData.status,
     };
 
     try {
@@ -229,17 +245,16 @@ function TariffsTypes() {
           <div className="bg-white rounded shadow p-4 h-full overflow-hidden">
             <UniversalTable
               tableHeadItems={tariffsTypesTableHeadItems}
-              className="grid-cols-[80px_1fr_1fr_120px_auto]"
+              className="grid-cols-[80px_1fr_1fr_180px_auto]"
             >
               <TariffsTypesTbody
-                className="grid-cols-[80px_1fr_1fr_120px_auto]"
+                className="grid-cols-[80px_1fr_1fr_180px_auto]"
                 datas={datas}
                 onEdit={(item) => {
                   setSelectedData(item);
                   setFormData({
                     name_ru: item.name_ru || "",
                     name_en: item.name_en || "",
-                    status: item.status || "ACTIVE",
                   });
                   setModalType("edit");
                   setIsShow(true);

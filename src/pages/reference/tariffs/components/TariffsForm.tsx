@@ -78,13 +78,22 @@ export default function TariffsForm({
     staleTime: Infinity,
   });
   const partners = partnersResponse?.data?.data || [];
+
   // GET regions for form
   const { data: regionsResponse } = useQuery({
     queryKey: ["regions"],
-    queryFn: () => referenceAPI.getRegions({ page: 1 }),
+    queryFn: () => referenceAPI.getRegions(undefined, 1),
     staleTime: Infinity,
   });
   const regions = regionsResponse?.data?.data || [];
+
+  // GET tariff types for form
+  const { data: tariffTypesResponse } = useQuery({
+    queryKey: ["tariffTypes"],
+    queryFn: () => referenceAPI.getTariffTypes(),
+    staleTime: Infinity,
+  });
+  const tariffTypes = tariffTypesResponse?.data?.data || [];
 
   // Edit rejimida eski datalarni yuklash
   useEffect(() => {
@@ -104,12 +113,7 @@ export default function TariffsForm({
     { id: "INACTIVE", name_ru: "Неактивный" },
   ];
 
-  // Type options
-  const typeOptions = [
-    { id: "TURBO", name_ru: "Turbo" },
-    { id: "STANDARD", name_ru: "Standard" },
-    { id: "PREMIUM", name_ru: "Premium" },
-  ];
+  // Type options - now using tariff types from API
 
   // Field konfiguratsiyasi
   const fields = [
@@ -164,10 +168,10 @@ export default function TariffsForm({
       isRequired: false,
     },
     {
-      label: "Тип",
+      label: "Тип тарифа",
       name: "type",
       typeElement: "select",
-      options: typeOptions,
+      options: tariffTypes || [],
       valueKey: "id",
       labelKey: "name_ru",
       isRequired: true,

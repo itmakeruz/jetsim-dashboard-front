@@ -4,7 +4,8 @@ interface Item {
   id: number;
   name_ru: string;
   name_en: string;
-  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface TariffsTypesTbodyProps {
@@ -20,6 +21,17 @@ function TariffsTypesTbody({
   onDelete,
   className,
 }: TariffsTypesTbodyProps) {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ru-RU", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <>
       {datas.map((item, index) => (
@@ -30,13 +42,7 @@ function TariffsTypesTbody({
           <span>{item?.id}</span>
           <span className="uppercase">{item.name_ru}</span>
           <span className="uppercase">{item.name_en}</span>
-          <span
-            className={`${
-              item.status === "ACTIVE" ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {item.status}
-          </span>
+          <span className="text-gray-600">{formatDate(item.created_at)}</span>
           <div className="flex items-center justify-start gap-3">
             <Pencil
               onClick={() => onEdit(item)}

@@ -51,6 +51,6 @@ export const tariffsTypesTableHeadItems = [
   "ID",
   "Название (RU)",
   "Название (EN)",
-  "Статус",
+  "Дата создания",
   "Действие",
 ];
