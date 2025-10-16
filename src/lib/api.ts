@@ -151,5 +151,14 @@ export const referenceAPI = {
   deletePartner: (id) => axios.delete(`/partner/${id}`),
 
   // Users
-  getUsers: () => axios.get("/users"),
+  getUsers: (search: string | null = null, page: number = 1) => {
+    const params: {
+      search?: string | null;
+      page?: number;
+    } = {};
+
+    if (search) params.search = search;
+    if (page > 1) params.page = page;
+    return axios.get("/users", { params });
+  },
 };
