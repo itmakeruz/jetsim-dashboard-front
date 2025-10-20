@@ -1,79 +1,101 @@
 import CustomInput from "@/components/formElements/CustomInput";
 import CustomSelect from "@/components/formElements/CustomSelect";
-import MaskedPhoneInput from "@/components/formElements/MaskedPhoneInput";
 
-function TransactionsForm({
-  onChange,
-  formData,
-  required,
-  selectedData,
-  isError,
-  setIsError,
-  categories,
-}) {
+const transactionTypes = [
+  { value: "deposit", label: "Пополнение" },
+  { value: "withdrawal", label: "Снятие" },
+  { value: "transfer", label: "Перевод" },
+  { value: "refund", label: "Возврат" },
+];
+
+const transactionActions = [
+  { value: "completed", label: "Завершено" },
+  { value: "pending", label: "В ожидании" },
+  { value: "failed", label: "Неудачно" },
+  { value: "cancelled", label: "Отменено" },
+];
+
+function TransactionsForm({ formData, setFormData, editData }) {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "agent" || name === "user") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: { name: value },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
   return (
-    <>
+    <div className="space-y-4">
       <CustomInput
-        onChange={onChange}
+        onChange={handleChange}
         className="max-w-[410px]"
-        label="ФИО"
-        placeholder="ФИО"
-        name={"fullName"}
-        value={formData?.fullName ?? selectedData?.fullName ?? ""}
-        required={required}
-      />
-      <MaskedPhoneInput
-        name="additionalPhone"
-        label="Телефон"
-        value={formData?.phoneNumber ?? selectedData?.phoneNumber ?? ""}
-        onChange={onChange}
-        className="max-w-[410px]"
-        required={required}
-      />
-      <CustomSelect
-        name={"status"}
-        label={"Статус"}
-        setIsError={setIsError}
-        isError={isError}
-        value={formData?.status ?? selectedData?.status?.id ?? ""}
-        onChange={onChange}
+        label="Агент"
+        placeholder="Введите имя агента"
+        name="agent"
+        value={formData?.agent?.name || ""}
         required
-        options={categories}
-        placeholder="Выбрать файл"
+      />
+
+      <CustomInput
+        onChange={handleChange}
+        className="max-w-[410px]"
+        label="Пользователь"
+        placeholder="Введите имя пользователя"
+        name="user"
+        value={formData?.user?.name || ""}
+        required
+      />
+
+      <CustomInput
+        onChange={handleChange}
+        className="max-w-[410px]"
+        label="Сумма"
+        placeholder="Введите сумму"
+        name="amount"
+        type="number"
+        value={formData?.amount || ""}
+        required
+      />
+
+      <CustomSelect
+        name="type"
+        label="Тип транзакции"
+        value={formData?.type || ""}
+        onChange={handleChange}
+        required
+        options={transactionTypes}
+        placeholder="Выберите тип"
         className="border max-w-[410px] !text-[#929292] border-gray-300 bg-white rounded grow"
       />
-      <CustomInput
-        onChange={onChange}
-        className="max-w-[410px]"
-        label="Паспорт"
-        placeholder="Паспорт"
-        name={"passport"}
-        type="file"
-        value={formData?.passport ?? selectedData?.passport ?? ""}
-        required={required}
-      />
+
       <CustomSelect
-        name={"role"}
-        label={"Роль"}
-        setIsError={setIsError}
-        isError={isError}
-        value={formData?.role ?? selectedData?.role?.id ?? ""}
-        onChange={onChange}
+        name="action"
+        label="Действие"
+        value={formData?.action || ""}
+        onChange={handleChange}
         required
-        options={categories}
-        placeholder="Выбрать файл"
+        options={transactionActions}
+        placeholder="Выберите действие"
         className="border max-w-[410px] !text-[#929292] border-gray-300 bg-white rounded grow"
       />
+
       <CustomInput
-        onChange={onChange}
+        onChange={handleChange}
         className="max-w-[410px]"
-        label="Пароль"
-        placeholder="Пароль"
-        name={"password"}
-        value={formData?.password ?? selectedData?.password ?? ""}
-        required={required}
+        label="Сообщение"
+        placeholder="Введите сообщение"
+        name="message"
+        value={formData?.message || ""}
+        required
       />
-    </>
+    </div>
   );
 }
 

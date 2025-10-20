@@ -161,4 +161,20 @@ export const referenceAPI = {
     if (page > 1) params.page = page;
     return axios.get("/users", { params });
   },
+
+  // Transactions
+  getTransactions: (search: string | null = null, page: number = 1) => {
+    const params: {
+      search?: string | null;
+      page?: number;
+    } = {};
+
+    if (search) params.search = search;
+    if (page > 1) params.page = page;
+    return axios.get("/transactions", { params });
+  },
+  createTransaction: (data) => axios.post("/transactions", data),
+  updateTransaction: (id, data) => axios.patch(`/transactions/${id}`, data),
+  deleteTransaction: (id) => axios.delete(`/transactions/${id}`),
+  getTransactionById: (id) => axios.get(`/transactions/${id}`),
 };

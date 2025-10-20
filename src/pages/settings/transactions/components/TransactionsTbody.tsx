@@ -1,6 +1,6 @@
 import formatNumber from "@/utils/formatNumber";
 
-function TransactionsTbody({ datas, onEdit, onDelete, className }) {
+function TransactionsTbody({ datas, className }) {
   return (
     <>
       {datas.map((item, index) => (
@@ -11,10 +11,10 @@ function TransactionsTbody({ datas, onEdit, onDelete, className }) {
           <span>{item.id}</span>
           <span>{item.agent ? item.agent.name : "-"}</span>
           <span>{item.user ? item.user.name : "-"}</span>
-          <span>{formatNumber(+item.fee)} UZS</span>
+          <span>{formatNumber(+item.amount)} UZS</span>
           <span>{item.type}</span>
           <span>{item.action}</span>
-          <span>{item.message}</span>
+          <span className="truncate">{item.message}</span>
           <span>{item.created_at?.slice(0, 16).replace("T", " ")}</span>
         </div>
       ))}
