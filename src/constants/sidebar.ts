@@ -9,6 +9,10 @@ import {
   CircleHelp,
   Newspaper,
   UserCog,
+  MessageCircle,
+  Headset,
+  FolderOpen,
+  Users2,
 } from "lucide-react";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 
@@ -70,15 +74,25 @@ const adminMenu = [
     ],
   },
   {
-    label: "Настройки",
-    icon: Settings,
+    label: "Служба поддержки",
+    icon: Headset,
     children: [
       {
-        path: "/partners",
-        label: "Партнеры",
-        icon: UserCog,
+        path: "/support/operators",
+        label: "Операторы",
+        icon: Users2,
+      },
+      {
+        path: "/support/categories",
+        label: "Категории",
+        icon: FolderOpen,
       },
     ],
+  },
+  {
+    path: "/partners",
+    label: "Партнеры",
+    icon: UserCog,
   },
 ];
 

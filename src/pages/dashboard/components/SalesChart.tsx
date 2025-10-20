@@ -65,22 +65,6 @@ export default function SalesChart() {
             activeDot={{ r: 6 }}
             name="Общая сумма"
           />
-          <Line
-            type="monotone"
-            dataKey="product_amount"
-            stroke="#82ca9d"
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
-            name="Сумма товаров"
-          />
-          <Line
-            type="monotone"
-            dataKey="simcard_amount"
-            stroke="#ffc658"
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
-            name="Сумма сим-карт"
-          />
         </LineChart>
       </ResponsiveContainer>
     </div>

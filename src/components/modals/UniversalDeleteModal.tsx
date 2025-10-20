@@ -7,6 +7,7 @@ function UniversalDeleteModal({
   loading = false,
   onClose,
 }) {
+  console.log(selectedData);
 
   return (
     <div className="fixed inset-0 z-[11111] grid place-content-center ">
@@ -18,7 +19,10 @@ function UniversalDeleteModal({
         <h3 className="text-[30px] font-bold">Удалить элемент?</h3>
         <p className="text-[20px] my-[15px]">
           Вы уверены, что хотите удалить{" "}
-          <span className="font-bold">{selectedData?.name_ru || selectedData?.name}</span>?
+          <span className="font-bold">
+            {selectedData?.name?.ru || selectedData?.name?.en}
+          </span>
+          ?
         </p>
         <div className="border-l-[10px] border-main-blue bg-[#589bff1a] gap-2 p-[12px] flex flex-col">
           <span className="flex items-center gap-1 font-semibold text-[18px] text-red-500">

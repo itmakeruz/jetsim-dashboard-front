@@ -24,6 +24,10 @@ import Transactions from "../pages/settings/transactions";
 import Partners from "../pages/partners";
 import Users from "../pages/users";
 
+// Support
+import Operators from "../pages/support/operators";
+import Categories from "../pages/support/categories";
+
 const adminRoutes = [
   { path: "/", element: <Dashboard /> },
 
@@ -54,6 +58,8 @@ const adminRoutes = [
 
   // Настройки
   { path: "/transactions", element: <Transactions /> },
+  { path: "/support/operators", element: <Operators /> },
+  { path: "/support/categories", element: <Categories /> },
 ];
 
 export default adminRoutes;

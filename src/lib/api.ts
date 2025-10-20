@@ -178,3 +178,34 @@ export const referenceAPI = {
   deleteTransaction: (id) => axios.delete(`/transactions/${id}`),
   getTransactionById: (id) => axios.get(`/transactions/${id}`),
 };
+
+// Support API
+export const supportAPI = {
+  // Operators
+  getOperators: () =>
+    axios.get("https://support-api.jetsim.ru/chat/dashboard/operators"),
+  createOperator: (data) =>
+    axios.post("https://support-api.jetsim.ru/chat/auth/signup", data),
+  updateOperator: (id, data) =>
+    axios.put(
+      `https://support-api.jetsim.ru/chat/dashboard/operators/${id}`,
+      data
+    ),
+  deleteOperator: (id) =>
+    axios.delete(
+      `https://support-api.jetsim.ru/chat/dashboard/operators/${id}`
+    ),
+
+  // Categories
+  getCategories: () =>
+    axios.get("https://support-api.jetsim.ru/chat/dashboard/category"),
+  createCategory: (data) =>
+    axios.post("https://support-api.jetsim.ru/chat/dashboard/category", data),
+  updateCategory: (id, data) =>
+    axios.put(
+      `https://support-api.jetsim.ru/chat/dashboard/category/${id}`,
+      data
+    ),
+  deleteCategory: (id) =>
+    axios.delete(`https://support-api.jetsim.ru/chat/dashboard/category/${id}`),
+};

@@ -13,10 +13,10 @@ const Dashboard = () => {
     <DataProvider>
       <div className="flex flex-col gap-4">
         {/* {!hasRole(user, "Turagent") && !hasRole(user, "manager") && <Filters />} */}
-        {/* <StatsCards /> */}
+        <StatsCards />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-          {/* <SalesChart /> */}
-          {/* <TopProducts /> */}
+          <SalesChart />
+          <TopProducts />
         </div>
       </div>
     </DataProvider>
