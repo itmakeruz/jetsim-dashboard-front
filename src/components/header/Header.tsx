@@ -9,22 +9,15 @@ import { useEffect, useState } from "react";
 import selectConfigs from "@/constants/headerOptions";
 import { useAuthStore } from "@/store/authStore";
 import Loader from "../Loader";
-import formatNumber from "@/utils/formatNumber";
-import { usersAPI } from "@/lib/api";
-import { showToast } from "@/utils/toastHelper";
 
 function Header({ setOpenMenu }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [data, setData] = useState(null);
   const { id } = useParams();
-  const {
-    user,
-    isLoading,
-  } = useAuthStore();
+  const { isLoading } = useAuthStore();
 
   const activeLabel = getActiveLabel(adminMenu, pathname);
-
 
   const currentOptions = selectConfigs[pathname] || [];
   const excludeHeaderLeftPages = ["/reports/"];
@@ -68,8 +61,6 @@ function Header({ setOpenMenu }) {
       }
     }
   }, []);
-
-
 
   if (isLoading) {
     return <Loader />;
