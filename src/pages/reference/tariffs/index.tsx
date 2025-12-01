@@ -266,10 +266,10 @@ function Tariffs() {
           <div className="bg-white rounded shadow p-4 h-full overflow-hidden">
             <UniversalTable
               tableHeadItems={tariffsTableHeadItems}
-              className="grid-cols-[40px_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+              className="grid-cols-[40px_1fr_1fr_1fr_1fr_1fr_1fr_1fr_70px]"
             >
               <TariffsTbody
-                className="grid-cols-[40px_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                className="grid-cols-[40px_1fr_1fr_1fr_1fr_1fr_1fr_1fr_70px]"
                 datas={datas}
                 onEdit={(item) => {
                   setSelectedData(item);

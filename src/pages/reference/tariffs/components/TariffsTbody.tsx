@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/dateFormatter";
 import formatNumber from "@/utils/formatNumber";
 import { Pencil, Trash2 } from "lucide-react";
 
@@ -29,6 +30,9 @@ function TariffsTbody({ datas, onEdit, className, onDelete }) {
           </span>
           <span className="flex items-center">
             {formatNumber(+item.price_sell || 0)} ₽
+          </span>
+          <span className="flex items-center">
+            {formatDate(item.created_at)}
           </span>
 
           <div className="flex items-center justify-start gap-3">
