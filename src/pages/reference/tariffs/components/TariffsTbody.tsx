@@ -25,10 +25,10 @@ function TariffsTbody({ datas, onEdit, className, onDelete }) {
             {item.quantity_minute || 0} мин
           </span>
           <span className="flex items-center">
-            {formatNumber(+item.price_arrival || 0)}
+            {formatNumber(+item.price_arrival || 0)} ₽
           </span>
           <span className="flex items-center">
-            {formatNumber(+item.price_sell || 0)}
+            {formatNumber(+item.price_sell || 0)} ₽
           </span>
 
           <div className="flex items-center justify-start gap-3">

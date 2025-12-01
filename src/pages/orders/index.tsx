@@ -150,9 +150,8 @@ function Orders() {
                             SIM {simIndex + 1}:
                           </span>
                           <span className="bg-gray-100 px-2 py-1 rounded">
-                            {formatNumber(sim.tariff.price_sell)} сум{" "}
-                            {sim.tariff.quantity_internet} GB{" "}
-                            1 день
+                            {formatNumber(sim.tariff.price_sell)} ₽{" "}
+                            {sim.tariff.quantity_internet} GB 1 день
                           </span>
                           {sim.qrcode && (
                             <span className="bg-green-100 text-green-800 px-2 py-1 rounded">

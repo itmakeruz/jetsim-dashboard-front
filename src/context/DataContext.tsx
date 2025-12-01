@@ -33,7 +33,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
         id: 3,
         title: "Общая выручка",
         value: mockDashboardStats.total_revenue,
-        currency: "сум",
+        currency: "₽",
         percent: mockDashboardStats.revenue_change,
       },
       {
