@@ -21,7 +21,7 @@ function TariffsTbody({ datas, onEdit, className, onDelete }) {
             title={item.name_ru || item.name_en || "Название не указано"}
             className="flex items-center line-clamp-1! overflow-ellipsis"
           >
-            {item.name_ru || item.name_en || "Название не указано"} asdasda s
+            {item.name_ru || item.name_en || "Название не указано"}
             asdasd
           </span>
           <div className="flex items-center">
