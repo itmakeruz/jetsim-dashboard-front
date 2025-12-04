@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import CustomInput from "@/components/formElements/CustomInput";
-import { handleChange } from '@/utils/handleChange';
+import { handleChange } from "@/utils/handleChange";
 import MultiSelect from "@/components/formElements/MultiSelect";
 import { referenceAPI } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -13,10 +13,9 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
   // Fetch region categories
   const { data: regionsResponse, isLoading: isRegionsLoading } = useQuery({
     queryKey: ["regions"],
-    queryFn: () => referenceAPI.getRegions({}),
+    queryFn: () => referenceAPI.getRegions(""),
   });
   const regions = regionsResponse?.data?.data || [];
-
 
   // Transform categories for MultiSelect
   const categoryOptions = useMemo(() => {
@@ -29,7 +28,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
 
   // Get selected categories for MultiSelect
   const selectedRegions = useMemo(() => {
-    if (!formData?.regions || formData.regions.length === 0) {
+    if (!formData?.region_ids || formData.region_ids.length === 0) {
       return [];
     }
     // Filter options to get only selected ones by ID
@@ -41,7 +40,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
   const handleCategoryChange = (e: any) => {
     const selectedItems = e.target.value || [];
     const regionIds = selectedItems.map((item: any) => item.id);
-    setFormData((prev: any) => ({ ...prev, regions: regionIds }));
+    setFormData((prev: any) => ({ ...prev, region_ids: regionIds }));
   };
   return (
     <>
@@ -66,13 +65,14 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
       <CustomInput
         onChange={handleChange(setFormData, setPreviewImage)}
         className="max-w-[320px]"
-        label="Флаг"
+        label="Изображение"
         placeholder="Выберите иконку"
-        name="icon"
+        name="image"
         type="file"
         accept="image/*"
         required={!editData}
-      /> <CustomSelect
+      />{" "}
+      <CustomSelect
         onChange={handleChange(setFormData)}
         className="max-w-[320px] w-full"
         label="Статус"
@@ -83,7 +83,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
       />
       <MultiSelect
         label="Регионы"
-        name="regions"
+        name="region_ids"
         value={selectedRegions}
         options={categoryOptions}
         onChange={handleCategoryChange}

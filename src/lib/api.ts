@@ -89,7 +89,7 @@ export const referenceAPI = {
     return axios.get("/region-group/admin", { params });
   },
   createRegionGroup: (data) =>
-    axios.post("/region/region-group", data, {
+    axios.post("/region-group", data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   updateRegionGroup: (id, data) =>

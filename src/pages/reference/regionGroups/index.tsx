@@ -25,8 +25,8 @@ function RegionsGroup() {
   const [formData, setFormData] = useState({
     name_ru: "",
     name_en: "",
-    icon: null as File | null,
-    regions: [],
+    image: null as File | null,
+    region_ids: [],
   });
   const [selectedData, setSelectedData] = useState<any>(null);
   const [modalType, setModalType] = useState("");
@@ -106,12 +106,13 @@ function RegionsGroup() {
     setFormData({
       name_ru: "",
       name_en: "",
-      icon: null,
-      regions: [],
+      image: null,
+      region_ids: [],
     });
     setModalType("");
     setSelectedData(null);
   };
+  console.log(formData);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -121,10 +122,10 @@ function RegionsGroup() {
     formDataToSend.append("name_ru", formData.name_ru);
     formDataToSend.append("name_en", formData.name_en);
     // region array
-    formDataToSend.append("regions", JSON.stringify(formData.regions));
+    formDataToSend.append("region_ids", JSON.stringify(formData.region_ids));
 
-    if (formData.icon) {
-      formDataToSend.append("icon", formData.icon);
+    if (formData.image) {
+      formDataToSend.append("image", formData.image);
     }
 
     try {
@@ -231,7 +232,7 @@ function RegionsGroup() {
                   setSelectedData(item);
                   setFormData({
                     ...item,
-                    regions: item.regions.map((region: any) => region.id),
+                    region_ids: item.regions.map((region: any) => region.id),
                   });
                   setModalType("edit");
                   setIsShow(true);
