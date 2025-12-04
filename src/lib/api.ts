@@ -86,17 +86,17 @@ export const referenceAPI = {
 
     if (search) params.search = search;
     if (page > 1) params.page = page;
-    return axios.get("/region/region-group/admin", { params });
+    return axios.get("/region-group/admin", { params });
   },
   createRegionGroup: (data) =>
     axios.post("/region/region-group", data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   updateRegionGroup: (id, data) =>
-    axios.patch(`/region/region-group/${id}`, data, {
+    axios.patch(`/region-group/${id}`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
-  deleteRegionGroup: (id) => axios.delete(`/region/region-group/${id}`),
+  deleteRegionGroup: (id) => axios.delete(`/region-group/${id}`),
 
   // Regions
   getRegions: (search?: string | null, page: number = 1) => {
