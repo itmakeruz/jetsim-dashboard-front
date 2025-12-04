@@ -223,7 +223,6 @@ function Tariffs() {
     const params = new URLSearchParams(searchParams);
     if (debouncedSearch) params.set("search", debouncedSearch);
     else params.delete("search");
-    params.set("page", "1");
     setSearchParams(params, { replace: true });
   }, [debouncedSearch]);
 

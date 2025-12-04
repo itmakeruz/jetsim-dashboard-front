@@ -5,11 +5,9 @@ import {
   Globe,
   ClipboardList,
   List,
-  Settings,
   CircleHelp,
   Newspaper,
   UserCog,
-  MessageCircle,
   Headset,
   FolderOpen,
   Users2,
@@ -47,18 +45,7 @@ const adminMenu = [
   {
     label: "Тарифы",
     icon: ClipboardList,
-    children: [
-      {
-        path: "/tariffs",
-        label: "Тарифы",
-        icon: ClipboardList,
-      },
-      {
-        path: "/tariff-types",
-        label: "Типы тарифов",
-        icon: List,
-      },
-    ],
+    path: "/tariffs",
   },
   {
     path: "/orders",

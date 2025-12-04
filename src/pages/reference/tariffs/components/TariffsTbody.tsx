@@ -16,7 +16,7 @@ function TariffsTbody({ datas, onEdit, className, onDelete }) {
           key={item.id || index}
           className={`grid w-full py-1 min-h-[36px] border-t border-[#E3E4E8] items-center gap-4 text-sm text-main-black font-medium ${className}`}
         >
-          <span className="flex items-center justify-center">{index + 1}</span>
+          <span className="flex items-center justify-center">{item.id}</span>
           <span className="flex items-center">
             {item.name_ru || item.name_en || "Название не указано"}
           </span>

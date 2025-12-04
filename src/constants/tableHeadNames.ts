@@ -1,5 +1,5 @@
 export const tariffsTableHeadItems = [
-  "№",
+  "ID",
   "Название тарифа",
   "Регионы",
   "SMS",

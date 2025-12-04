@@ -174,6 +174,15 @@ export default function TariffsForm({
       isRequired: false,
     },
     {
+      label: "Статус",
+      name: "status",
+      typeElement: "select",
+      options: statusOptions,
+      valueKey: "id",
+      labelKey: "name_ru",
+      isRequired: true,
+    },
+    {
       label: "Количество интернет (GB)",
       name: "quantity_internet",
       typeElement: "input",
@@ -184,15 +193,6 @@ export default function TariffsForm({
       name: "title_en",
       typeElement: "input",
       isRequired: false,
-    },
-    {
-      label: "Статус",
-      name: "status",
-      typeElement: "select",
-      options: statusOptions,
-      valueKey: "id",
-      labelKey: "name_ru",
-      isRequired: true,
     },
     {
       label: "Срок действия (дни)",
