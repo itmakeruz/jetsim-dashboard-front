@@ -33,10 +33,13 @@ function TariffsTbody({ datas, onEdit, className, onDelete }) {
             </UniversalBtn>
           </div>
           <span className="flex items-center">
-            {item.quantity_sms || 0} SMS
+            {item.quantity_sms.toLocaleString() || 0} SMS
           </span>
           <span className="flex items-center">
-            {item.quantity_minute || 0} мин
+            {item.quantity_minute.toLocaleString() || 0} мин
+          </span>
+          <span className="flex items-center">
+            {item.quantity_internet.toLocaleString() || 0} GB
           </span>
           <span className="flex items-center">
             {formatNumber(+item.price_arrival || 0)} ₽
