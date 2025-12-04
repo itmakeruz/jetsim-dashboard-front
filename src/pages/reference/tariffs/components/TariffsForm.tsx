@@ -95,6 +95,14 @@ export default function TariffsForm({
   });
   const tariffTypes = tariffTypesResponse?.data?.data || [];
 
+  // GET region groups for form
+  const { data: regionGroupsResponse } = useQuery({
+    queryKey: ["regionGroups"],
+    queryFn: () => referenceAPI.getRegionGroups(null, 1),
+    staleTime: Infinity,
+  });
+  const regionGroups = regionGroupsResponse?.data?.data || [];
+
   // Edit rejimida eski datalarni yuklash
   useEffect(() => {
     if (editData) {
@@ -145,14 +153,12 @@ export default function TariffsForm({
       isRequired: true,
     },
     {
-      label: "Регионы",
-      name: "region_ids",
+      label: "Группа регионов",
+      name: "region_group_id",
       typeElement: "select",
-      options: regions || [],
+      options: regionGroups || [],
       valueKey: "id",
       labelKey: "name_ru",
-      isMulti: true,
-      isSearchable: true,
       isRequired: false,
     },
     {
@@ -166,15 +172,6 @@ export default function TariffsForm({
       name: "title_ru",
       typeElement: "input",
       isRequired: false,
-    },
-    {
-      label: "Тип тарифа",
-      name: "type",
-      typeElement: "select",
-      options: tariffTypes || [],
-      valueKey: "id",
-      labelKey: "name_ru",
-      isRequired: true,
     },
     {
       label: "Количество интернет (GB)",
@@ -242,6 +239,21 @@ export default function TariffsForm({
     {
       label: "Популярный",
       name: "is_popular",
+      typeElement: "checkbox",
+    },
+    {
+      label: "Глобальный",
+      name: "is_global",
+      typeElement: "checkbox",
+    },
+    {
+      label: "Локальный",
+      name: "is_local",
+      typeElement: "checkbox",
+    },
+    {
+      label: "Региональный",
+      name: "is_regional",
       typeElement: "checkbox",
     },
   ];
@@ -358,7 +370,7 @@ export default function TariffsForm({
                 (o) => o.id === selectedValue
               );
               const regionIds = selectedGroup?.regions?.map((r) => r.id) || [];
-              updated.regions = regionIds;
+              updated.region_ids = regionIds;
             }
 
             setFormData(updated);

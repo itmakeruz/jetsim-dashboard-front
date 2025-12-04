@@ -13,6 +13,7 @@ import UniversalModal from "@/components/modals/UniversalModal";
 
 import UsersTbody from "./components/UsersTbody";
 import Loader from "@/components/Loader";
+import { getImageUrl } from "@/utils/imageUtils";
 
 const usersTableHeadItems = [
   "ID",
@@ -206,7 +207,7 @@ function Users() {
                     Фото профиля
                   </label>
                   <img
-                    src={selectedUser.image}
+                    src={getImageUrl(selectedUser.image)}
                     alt="Profile"
                     className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
                     onError={(e) => {

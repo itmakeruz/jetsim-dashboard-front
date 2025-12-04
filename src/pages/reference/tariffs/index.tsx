@@ -29,6 +29,7 @@ function Tariffs() {
     title_en: "",
     partner_id: null,
     region_ids: [],
+    region_group_id: null,
     quantity_sms: 0,
     quantity_minute: 0,
     quantity_internet: 0,
@@ -41,6 +42,9 @@ function Tariffs() {
     is_popular: false,
     is_4g: false,
     is_5g: false,
+    is_global: false,
+    is_local: false,
+    is_regional: false,
     type: null, // Changed to null to store tariff type ID
   });
   const [selectedData, setSelectedData] = useState<any>(null);
@@ -120,6 +124,7 @@ function Tariffs() {
       title_en: "",
       partner_id: null,
       region_ids: [],
+      region_group_id: null,
       quantity_sms: 0,
       quantity_minute: 0,
       quantity_internet: 0,
@@ -132,6 +137,9 @@ function Tariffs() {
       is_popular: false,
       is_4g: false,
       is_5g: false,
+      is_global: false,
+      is_local: false,
+      is_regional: false,
       type: null,
     });
     setModalType("");
@@ -142,13 +150,12 @@ function Tariffs() {
     e.preventDefault();
 
     // Prepare data for submission
-    const dataToSend = {
+    const dataToSend: any = {
       name_ru: formData.name_ru,
       name_en: formData.name_en,
       title_ru: formData.title_ru,
       title_en: formData.title_en,
       partner_id: formData.partner_id,
-      region_ids: formData.region_ids,
       quantity_sms: Number(formData.quantity_sms),
       quantity_minute: Number(formData.quantity_minute),
       quantity_internet: Number(formData.quantity_internet),
@@ -161,8 +168,25 @@ function Tariffs() {
       is_popular: formData.is_popular,
       is_4g: formData.is_4g,
       is_5g: formData.is_5g,
-      type: Number(formData.type), // Ensure type is sent as number (tariff type ID)
+      is_global: formData.is_global,
+      is_local: formData.is_local,
+      is_regional: formData.is_regional,
     };
+
+    // Add region_group_id if provided
+    if (formData.region_group_id) {
+      dataToSend.region_group_id = Number(formData.region_group_id);
+    }
+
+    // Add region_ids if provided (array)
+    if (formData.region_ids && formData.region_ids.length > 0) {
+      dataToSend.region_ids = formData.region_ids.map((id: any) => Number(id));
+    }
+
+    // Add type if provided (tariff type ID)
+    if (formData.type) {
+      dataToSend.type = Number(formData.type);
+    }
 
     try {
       if (isEditMode) {
@@ -277,8 +301,13 @@ function Tariffs() {
                     ...item,
                     region_ids:
                       item.regions?.map((region: any) => region.id) || [],
+                    region_group_id:
+                      item.region_group_id || item.region_group?.id || null,
                     partner_id: item.partner?.id || null,
                     type: item.tariff_type?.id || item.type || null,
+                    is_global: item.is_global || false,
+                    is_local: item.is_local || false,
+                    is_regional: item.is_regional || false,
                   });
                   setModalType("edit");
                   setIsShow(true);
