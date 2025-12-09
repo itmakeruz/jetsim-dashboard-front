@@ -177,6 +177,12 @@ export const referenceAPI = {
   updateTransaction: (id, data) => axios.patch(`/transactions/${id}`, data),
   deleteTransaction: (id) => axios.delete(`/transactions/${id}`),
   getTransactionById: (id) => axios.get(`/transactions/${id}`),
+
+  // Staff (Employees)
+  getStaff: () => axios.get("/staff"),
+  createStaff: (data) => axios.post("/staff", data),
+  updateStaff: (id, data) => axios.put(`/staff/${id}`, data),
+  deleteStaff: (id) => axios.delete(`/staff/${id}`),
 };
 
 // Support API

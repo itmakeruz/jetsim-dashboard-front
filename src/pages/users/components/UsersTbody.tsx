@@ -1,4 +1,5 @@
 import { getImageUrl } from "@/utils/imageUtils";
+import { formatPhoneNumber } from "@/utils/phoneNumberFormatter";
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -63,14 +64,17 @@ function UsersTbody({ datas, className, onView }: UsersProps) {
               {item?.name || "Nomsiz foydalanuvchi"}
             </span>
           </div>
-          <span className="px-3 py-2 text-blue-600 font-medium">
+          <Link
+            to={`mailto:${item.email}`}
+            className="px-3 py-2 text-blue-600 font-medium"
+          >
             {item.email}
-          </span>
+          </Link>
           <Link
             to={`tel:${item.phone_number}`}
             className="px-3 py-2 text-gray-600"
           >
-            {item.phone_number || "—"}
+            {formatPhoneNumber(item.phone_number) || "—"}
           </Link>
           <span className="px-3 py-2">
             <span

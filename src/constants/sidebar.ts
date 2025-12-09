@@ -11,6 +11,8 @@ import {
   Headset,
   FolderOpen,
   Users2,
+  User,
+  IdCardIcon,
 } from "lucide-react";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 
@@ -20,6 +22,11 @@ const adminMenu = [
     path: "/users",
     label: "Пользователи",
     icon: Users,
+  },
+  {
+    path: "/employees",
+    label: "Сотрудники",
+    icon: IdCardIcon,
   },
   {
     label: "Транзакции",
