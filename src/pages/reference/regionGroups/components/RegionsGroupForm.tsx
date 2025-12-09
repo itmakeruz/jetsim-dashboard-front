@@ -28,12 +28,12 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
 
   // Get selected categories for MultiSelect
   const selectedRegions = useMemo(() => {
-    if (!formData?.region_ids || formData.region_ids.length === 0) {
+    if (!formData?.regions || formData.regions.length === 0) {
       return [];
     }
     // Filter options to get only selected ones by ID
     return categoryOptions.filter((option: any) =>
-      formData.regions.includes(option.id)
+      formData.regions.map((region: any) => region.id).includes(option.id)
     );
   }, [formData?.regions, categoryOptions]);
 
