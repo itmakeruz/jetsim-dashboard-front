@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 import CustomInput from "@/components/formElements/CustomInput";
 import UniversalBtn from "@/components/buttons/UniversalBtn";
 import { handleChange } from "@/utils/handleChange";
@@ -12,6 +13,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { login, isLoading, token, getProfile, logout } = useAuthStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
     login: "",
@@ -27,7 +29,7 @@ export default function Login() {
             navigate("/", { replace: true });
             return;
           } else {
-            logout()
+            logout();
             toast.error(result.message);
           }
         } catch (error) {
@@ -73,15 +75,30 @@ export default function Login() {
           required
           className="max-w-[320px]"
         />
-        <CustomInput
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange(setForm)}
-          required
-          className="max-w-[320px]"
-        />
+        <div className="relative max-w-[320px]">
+          <CustomInput
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange(setForm)}
+            required
+            className="max-w-[320px] pr-10"
+            divClassname=""
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            title={showPassword ? "Скрыть пароль" : "Показать пароль"}
+          >
+            {showPassword ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+          </button>
+        </div>
         <UniversalBtn
           type="submit"
           disabled={isLoading}
