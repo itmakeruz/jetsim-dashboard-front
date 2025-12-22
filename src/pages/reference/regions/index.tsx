@@ -41,7 +41,7 @@ function Regions() {
   const { data: response, isLoading } = useQuery({
     queryKey: ["regions", currentPage, debouncedSearch],
     queryFn: () =>
-      referenceAPI.getRegions(debouncedSearch || null, currentPage),
+      referenceAPI.getRegions(debouncedSearch || null, currentPage, 500),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });

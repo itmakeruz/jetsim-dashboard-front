@@ -99,7 +99,11 @@ export const referenceAPI = {
   deleteRegionGroup: (id) => axios.delete(`/region-group/${id}`),
 
   // Regions
-  getRegions: (search?: string | null, page: number = 1) => {
+  getRegions: (
+    search?: string | null,
+    page: number = 1,
+    size: number = 500
+  ) => {
     const params: {
       search?: string | null;
       page?: number;
@@ -108,6 +112,7 @@ export const referenceAPI = {
 
     if (search) params.search = search;
     if (page > 1) params.page = page;
+    if (size) params.size = size;
     return axios.get("/region/admin", { params });
   },
   createRegion: (data) =>
