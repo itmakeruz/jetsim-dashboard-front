@@ -112,7 +112,6 @@ function RegionsGroup() {
     setModalType("");
     setSelectedData(null);
   };
-  console.log(formData);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
