@@ -78,14 +78,16 @@ export const ordersAPI = {
 export const referenceAPI = {
   get: (endpoint, params) => axios.get(endpoint, { params }),
   // Region Groups (Categories)
-  getRegionGroups: (search: string | null, page: number = 1) => {
+  getRegionGroups: (search: string | null, page: number = 1, size?: number) => {
     const params: {
       search?: string | null;
       page?: number;
+      size?: number;
     } = {};
 
     if (search) params.search = search;
     if (page > 1) params.page = page;
+    if (size) params.size = size;
     return axios.get("/region-group/admin", { params });
   },
   createRegionGroup: (data) =>

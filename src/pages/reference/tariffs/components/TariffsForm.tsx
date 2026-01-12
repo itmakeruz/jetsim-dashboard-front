@@ -98,7 +98,7 @@ export default function TariffsForm({
   // GET region groups for form
   const { data: regionGroupsResponse } = useQuery({
     queryKey: ["regionGroups"],
-    queryFn: () => referenceAPI.getRegionGroups(null, 1),
+    queryFn: () => referenceAPI.getRegionGroups(null, 1, 500),
     staleTime: Infinity,
   });
   const regionGroups = regionGroupsResponse?.data?.data || [];
