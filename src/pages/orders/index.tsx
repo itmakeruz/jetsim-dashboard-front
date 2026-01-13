@@ -31,17 +31,24 @@ const ordersTableHeadItems = [
 
 interface Tariff {
   id: number;
+  name_ru: string;
+  name_en: string;
   quantity_sms: number;
   quantity_minute: number;
   quantity_internet: number;
+  validity_period: number;
   price_sell: number;
 }
 
 interface Sim {
   id: number;
+  iccid: string;
+  pin_1: string;
+  puk_1: string | null;
   qrcode: string | null;
   tariff: Tariff;
   created_at: string;
+  day_left: number;
 }
 
 interface Order {
@@ -245,6 +252,32 @@ function Orders() {
                             {formatDate(sim.created_at)}
                           </p>
                         </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            ICCID
+                          </label>
+                          <p className="text-sm font-mono text-gray-900 break-all">
+                            {sim.iccid || "-"}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            PIN-1
+                          </label>
+                          <p className="text-sm font-mono font-semibold text-gray-900">
+                            {sim.pin_1 || "-"}
+                          </p>
+                        </div>
+                        {sim.puk_1 && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              PUK-1
+                            </label>
+                            <p className="text-sm font-mono font-semibold text-gray-900">
+                              {sim.puk_1}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -253,6 +286,14 @@ function Orders() {
                       <h3 className="text-sm font-semibold text-gray-900 mb-3">
                         Тарифный план
                       </h3>
+                      <div className="mb-3 pb-3 border-b border-gray-200">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Название тарифа
+                        </label>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {sim.tariff.name_ru || sim.tariff.name_en || "-"}
+                        </p>
+                      </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                           <div className="flex items-center gap-2">
@@ -324,21 +365,71 @@ function Orders() {
                           </div>
                         )}
 
-                        {/* <div className="col-span-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                           <div className="flex items-center gap-2">
-                            <div className="p-2 bg-gray-100 rounded-lg">
-                              <Calendar className="w-5 h-5 text-gray-600" />
+                            <div className="p-2 bg-indigo-100 rounded-lg">
+                              <Calendar className="w-5 h-5 text-indigo-600" />
                             </div>
                             <div>
                               <label className="block text-xs font-medium text-gray-500">
                                 Срок действия
                               </label>
-                              <p className="text-sm font-semibold text-gray-900">
-                                1 день
+                              <p className="text-base font-bold text-gray-900">
+                                {sim.tariff.validity_period}{" "}
+                                {sim.tariff.validity_period === 1
+                                  ? "день"
+                                  : sim.tariff.validity_period < 5
+                                  ? "дня"
+                                  : "дней"}
                               </p>
                             </div>
                           </div>
-                        </div> */}
+                        </div>
+
+                        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`p-2 rounded-lg ${
+                                sim.day_left > 7
+                                  ? "bg-green-100"
+                                  : sim.day_left > 3
+                                  ? "bg-yellow-100"
+                                  : "bg-red-100"
+                              }`}
+                            >
+                              <Calendar
+                                className={`w-5 h-5 ${
+                                  sim.day_left > 7
+                                    ? "text-green-600"
+                                    : sim.day_left > 3
+                                    ? "text-yellow-600"
+                                    : "text-red-600"
+                                }`}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-500">
+                                Осталось дней
+                              </label>
+                              <p
+                                className={`text-base font-bold ${
+                                  sim.day_left > 7
+                                    ? "text-green-600"
+                                    : sim.day_left > 3
+                                    ? "text-yellow-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {sim.day_left}{" "}
+                                {sim.day_left === 1
+                                  ? "день"
+                                  : sim.day_left < 5
+                                  ? "дня"
+                                  : "дней"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
