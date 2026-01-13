@@ -1,83 +1,98 @@
 import React, { createContext, useContext, useState, useMemo } from "react";
-import { mockDashboardStats, mockChartData } from "@/data/mockData";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardAPI } from "@/lib/api";
 
 const DataContext = createContext<any>(null);
 
 export const useDataContext = () => useContext(DataContext);
+
+// Color palette for top products
+const colors = [
+  "#3873D3",
+  "#F0A500",
+  "#FF6347",
+  "#50C878",
+  "#9370DB",
+  "#FF69B4",
+  "#20B2AA",
+  "#FFD700",
+  "#FF4500",
+  "#00CED1",
+];
 
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   // Filters state
   const [filters, setFilters] = useState({
     date_from: null,
     date_to: null,
-    user_id: null,
-    branch_id: null,
-    group_id: null,
   });
 
-  // Mock dashboard data
+  // Fetch dashboard data with date filter - only if both dates are selected
+  const { data: dashboardResponse, isLoading } = useQuery({
+    queryKey: ["dashboard", filters.date_from, filters.date_to],
+    queryFn: () => {
+      const params: any = {};
+
+      // Format date as date_from_date_to if both dates exist
+      if (filters.date_from && filters.date_to) {
+        params.date = `${filters.date_from}_${filters.date_to}`;
+      }
+
+      return dashboardAPI.getDashboard(params);
+    },
+    enabled: !!(filters.date_from && filters.date_to), // Only fetch if both dates are selected
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+  });
+
+  const dashboardData = dashboardResponse?.data?.data || {};
+
+  // Transform API data to component format
   const currentData = useMemo(() => {
     const stats = [
       {
         id: 1,
         title: "Всего заказов",
-        value: mockDashboardStats.total_orders,
-        percent: mockDashboardStats.orders_change,
+        value: dashboardData.total_orders || 0,
       },
       {
         id: 2,
         title: "Активные заказы",
-        value: mockDashboardStats.active_orders,
+        value: dashboardData.active_orders || 0,
       },
       {
         id: 3,
         title: "Общая выручка",
-        value: mockDashboardStats.total_revenue,
+        value: dashboardData.total_revenue || 0,
         currency: "₽",
-        percent: mockDashboardStats.revenue_change,
       },
       {
         id: 4,
         title: "Новые клиенты",
-        value: mockDashboardStats.new_customers,
-        percent: mockDashboardStats.customers_change,
+        value: dashboardData.new_clients || 0,
       },
     ];
 
-    const topProducts = [
-      {
-        id: 1,
-        title: "Europe Basic",
-        percentage: 45,
-        color: "#3873D3",
-      },
-      {
-        id: 2,
-        title: "Asia Premium",
-        percentage: 30,
-        color: "#F0A500",
-      },
-      {
-        id: 3,
-        title: "USA Standard",
-        percentage: 25,
-        color: "#FF6347",
-      },
-    ];
+    const topProducts =
+      dashboardData.top_tariffs?.map((tariff: any, index: number) => ({
+        id: tariff.id,
+        title: tariff.name_ru || tariff.name_en || "Unknown",
+        sold: tariff.sold || 0,
+        color: colors[index % colors.length],
+      })) || [];
 
+    // Transform daily sales to chart format
     const chartDatas = {
-      percent: mockDashboardStats.revenue_change,
-      summ: mockDashboardStats.total_revenue,
-      datas: mockChartData.map((item) => ({
-        name: new Date(item.date).toLocaleDateString("ru-RU", {
-          day: "2-digit",
-          month: "short",
-        }),
-        total_amount: item.revenue,
-        product_amount: item.revenue * 0.6,
-        simcard_amount: item.revenue * 0.4,
-        orders_count: item.orders,
-      })),
+      percent: null, // API doesn't provide this
+      summ: dashboardData.total_revenue || 0,
+      datas:
+        dashboardData.daily_sales?.map((item: any) => ({
+          name: new Date(item.day).toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "short",
+          }),
+          total_amount: item.total || 0,
+        })) || [],
     };
 
     return {
@@ -85,22 +100,20 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
       topProducts,
       chartDatas,
     };
-  }, [filters]);
+  }, [dashboardData]);
 
   const monthlyComparison = {
     current_month: {
       name: new Date().toLocaleDateString("ru-RU", { month: "long" }),
-      total_amount: mockDashboardStats.total_revenue,
+      total_amount: dashboardData.total_revenue || 0,
     },
     previous_month: {
       name: new Date(
         new Date().setMonth(new Date().getMonth() - 1)
       ).toLocaleDateString("ru-RU", { month: "long" }),
-      total_amount:
-        mockDashboardStats.total_revenue /
-        (1 + mockDashboardStats.revenue_change / 100),
+      total_amount: 0, // API doesn't provide previous month data
     },
-    percentage_change: mockDashboardStats.revenue_change,
+    percentage_change: null, // API doesn't provide this
   };
 
   return (
@@ -110,7 +123,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
         setFilters,
         currentData,
         monthlyComparison,
-        isLoading: false,
+        isLoading,
       }}
     >
       {children}

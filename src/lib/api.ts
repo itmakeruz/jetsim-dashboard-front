@@ -25,12 +25,9 @@ export const faqsAPI = {
   deleteFaq: (id) => axios.delete(`/faqs/${id}`),
 };
 
-// Dashboard API - Using inventory stats as alternative since no specific dashboard endpoints found
+// Dashboard API
 export const dashboardAPI = {
-  getStats: () => axios.get("/inventories/1/stats"),
-  getChartData: (warehouseId) => axios.get(`/inventories/${warehouseId}/stats`),
-  getTopProducts: (warehouseId) =>
-    axios.get(`/inventories/${warehouseId}/products`),
+  getDashboard: (params?: any) => axios.get("/dashboard", { params }),
 };
 
 // Site API - Exact match from api-data.json

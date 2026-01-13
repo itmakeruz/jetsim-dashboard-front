@@ -1,49 +1,56 @@
-import CustomSelect from "@/components/formElements/CustomSelect";
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { subDays, endOfDay } from "date-fns";
 import DateRangeTabs from "./DateRangeTabs";
 import { Tabs } from "@radix-ui/react-tabs";
 import getInitialRange from "@/utils/getInitialRange";
 import { useDataContext } from "@/context/DataContext";
-import { useApi } from "@/hooks/useApi";
 
 const Filters = () => {
-  const { filters, setFilters } = useDataContext();
-  // Fetch real options
-  const { data: branchesData, isLoading: branchesLoading } = useApi({
-    endpoint: "/branches",
-    method: "GET",
-  });
-  const { data: usersData, isLoading: usersLoading } = useApi({
-    endpoint: "/users",
-    method: "GET",
-  });
-  const { data: categoriesData, isLoading: categoriesLoading } = useApi({
-    endpoint: "/product-groups",
-    method: "GET",
+  const { setFilters } = useDataContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get initial values from URL or defaults
+  const urlTab = searchParams.get("tab");
+  const urlDateFrom = searchParams.get("date_from");
+  const urlDateTo = searchParams.get("date_to");
+
+  // Check if this is first load (no URL params)
+  const isFirstLoad = !urlTab && !urlDateFrom && !urlDateTo;
+
+  // Initialize state from URL or default to week
+  const [activeTab, setActiveTab] = useState(urlTab || "week");
+  const [range, setRange] = useState(() => {
+    if (urlDateFrom && urlDateTo) {
+      return [
+        {
+          startDate: new Date(urlDateFrom),
+          endDate: new Date(urlDateTo),
+          key: "selection",
+        },
+      ];
+    }
+    // If first load, use last 7 days up to today
+    if (isFirstLoad) {
+      const today = endOfDay(new Date());
+      const weekAgo = subDays(today, 6); // 7 days including today
+      return [
+        {
+          startDate: weekAgo,
+          endDate: today,
+          key: "selection",
+        },
+      ];
+    }
+    return [
+      {
+        ...getInitialRange(urlTab || "week"),
+        key: "selection",
+      },
+    ];
   });
 
-  // Map API data to options
-  const branchOptions = [
-    { id: "all", name: "Barchasi" },
-    ...(branchesData?.data?.map((b) => ({ id: b.id, name: b.name })) || []),
-  ];
-  const userOptions =
-    usersData?.data?.map((u) => ({ id: u.id, name: u.name })) || [];
-  const categoryOptions = [
-    { id: "all", name: "Barchasi" },
-    ...(categoriesData?.data?.map((c) => ({ id: c.id, name: c.name })) || []),
-  ];
-
-  // Make activeTab and range stateful
-  const [activeTab, setActiveTab] = useState("week");
-  const [range, setRange] = useState([
-    {
-      ...getInitialRange("week"),
-      key: "selection",
-    },
-  ]);
-
-  // When activeTab changes, update range accordingly
+  // Update URL when tab changes
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     const updatedRange = {
@@ -51,81 +58,103 @@ const Filters = () => {
       key: "selection",
     };
     setRange([updatedRange]);
-    // Update filters with new dates
-    setFilters((prev) => ({
-      ...prev,
-      date_from: updatedRange.startDate
-        ? updatedRange.startDate.toISOString().slice(0, 10)
-        : null,
-      date_to: updatedRange.endDate
-        ? updatedRange.endDate.toISOString().slice(0, 10)
-        : null,
-    }));
-  };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => {
-      if (value === "all") {
-        const updated = { ...prev };
-        delete updated[name];
-        return updated;
-      }
-      // group_id, branch_id, user_id should be numbers
-      if (["group_id", "branch_id", "user_id"].includes(name)) {
-        return { ...prev, [name]: Number(value) };
-      }
-      return { ...prev, [name]: value };
+    // Update URL
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", tab);
+    // Clear dates when tab changes
+    params.delete("date_from");
+    params.delete("date_to");
+    setSearchParams(params, { replace: true });
+
+    // Set filters with new range dates and send request
+    setFilters({
+      date_from: updatedRange.startDate.toISOString(),
+      date_to: updatedRange.endDate.toISOString(),
     });
   };
 
-  // Date range change handler
+  // Date range change handler - only update state, don't send request yet
   const handleDateChange = ({ startDate, endDate }) => {
-    setFilters((prev) => ({
-      ...prev,
-      date_from: startDate ? startDate.toISOString().slice(0, 10) : null,
-      date_to: endDate ? endDate.toISOString().slice(0, 10) : null,
-    }));
+    const newRange = [
+      {
+        startDate: startDate || range[0].startDate,
+        endDate: endDate || range[0].endDate,
+        key: "selection",
+      },
+    ];
+    setRange(newRange);
+
+    // Update URL
+    const params = new URLSearchParams(searchParams);
+    if (startDate) {
+      params.set("date_from", startDate.toISOString());
+    } else {
+      params.delete("date_from");
+    }
+    if (endDate) {
+      params.set("date_to", endDate.toISOString());
+    } else {
+      params.delete("date_to");
+    }
+    setSearchParams(params, { replace: true });
+
+    // Only update filters if both dates are selected
+    if (startDate && endDate) {
+      setFilters({
+        date_from: startDate.toISOString(),
+        date_to: endDate.toISOString(),
+      });
+    } else {
+      // Clear filters if dates are not complete
+      setFilters({
+        date_from: null,
+        date_to: null,
+      });
+    }
   };
 
-  // Show loading if any select is loading
-  if (branchesLoading || usersLoading || categoriesLoading) {
-    return <div className="p-4">Loading filters...</div>;
-  }
+  // Initialize filters on mount
+  useEffect(() => {
+    // Check if this is first load (no URL params)
+    const isFirstLoadCheck = !urlTab && !urlDateFrom && !urlDateTo;
+
+    if (urlDateFrom && urlDateTo) {
+      // If URL has dates, use them
+      setFilters({
+        date_from: urlDateFrom,
+        date_to: urlDateTo,
+      });
+    } else if (isFirstLoadCheck) {
+      // If first load, set filters with last 7 days
+      const today = endOfDay(new Date());
+      const weekAgo = subDays(today, 6);
+      setFilters({
+        date_from: weekAgo.toISOString(),
+        date_to: today.toISOString(),
+      });
+      // Update URL
+      const params = new URLSearchParams();
+      params.set("tab", "week");
+      params.set("date_from", weekAgo.toISOString());
+      params.set("date_to", today.toISOString());
+      setSearchParams(params, { replace: true });
+    } else if (urlTab) {
+      // If URL has tab but no dates, set filters with tab's initial range
+      const initialRange = getInitialRange(urlTab);
+      setFilters({
+        date_from: initialRange.startDate.toISOString(),
+        date_to: initialRange.endDate.toISOString(),
+      });
+    }
+  }, []);
 
   return (
     <Tabs
-      className="grid xl:grid-cols-[.5fr_.5fr_.5fr_1fr_1fr] w-full lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] sm:grid-cols-2 items-center xl:gap-4 lg:gap-3 gap-2"
+      className="w-full grid grid-cols-2"
       value={activeTab}
       onValueChange={handleTabChange}
     >
-      <CustomSelect
-        value={filters.group_id || "all"}
-        name={"group_id"}
-        options={categoryOptions}
-        placeholder="Группа товаров"
-        onChange={handleChange}
-        divClassname={"lg:col-span-2 xl:col-span-1"}
-        className="border !border-gray-300 bg-white rounded w-full"
-      />
-      <CustomSelect
-        value={filters.branch_id || "all"}
-        name={"branch_id"}
-        options={branchOptions}
-        placeholder="Филиал"
-        divClassname={"lg:col-span-2 xl:col-span-1"}
-        onChange={handleChange}
-        className="border !border-gray-300  bg-white rounded w-full"
-      />
-      <CustomSelect
-        value={filters.user_id || userOptions[0]?.id?.toString() || ""}
-        name={"user_id"}
-        options={userOptions}
-        placeholder="Кассир"
-        divClassname={"lg:col-span-2 xl:col-span-1"}
-        onChange={handleChange}
-        className="border !border-gray-300 bg-white rounded w-full"
-      />
       <DateRangeTabs
         setRange={setRange}
         range={range}

@@ -31,11 +31,10 @@ const DateRangeTabs = ({ handleChange, activeTab, range, setRange }) => {
         key: "selection",
       };
 
+      // Update range and trigger change with correct format
       handleChange?.({
-        target: { name: "startDate", value: updatedRange.startDate },
-      });
-      handleChange?.({
-        target: { name: "endDate", value: updatedRange.endDate },
+        startDate: updatedRange.startDate,
+        endDate: updatedRange.endDate,
       });
 
       return [updatedRange];

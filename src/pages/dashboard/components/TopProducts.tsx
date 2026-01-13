@@ -4,8 +4,8 @@ import { useDataContext } from "./../../../context/DataContext";
 function TopProducts() {
   const { currentData } = useDataContext();
 
-  const totalPercent = currentData.topProducts.reduce(
-    (prev, curr) => prev + curr.percentage,
+  const totalSold = currentData.topProducts.reduce(
+    (prev, curr) => prev + curr.sold,
     0
   );
 
@@ -21,14 +21,14 @@ function TopProducts() {
           <TopProductItem
             key={product.id}
             title={product.title}
-            percentage={product.percentage}
+            sold={product.sold}
             color={product.color}
           />
         ))}
       </div>
       <div className="mt-auto flex items-center justify-between">
         <span className="font-medium text-sm">Тотал</span>
-        <span className="font-medium text-sm">{totalPercent}%</span>
+        <span className="font-medium text-sm">{totalSold}</span>
       </div>
     </div>
   );

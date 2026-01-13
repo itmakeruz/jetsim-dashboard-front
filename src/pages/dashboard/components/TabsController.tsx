@@ -15,6 +15,18 @@ function TabsController({
   const [show, setShow] = useState(false);
   const formattedStart = format(range[0].startDate, "dd MMMM", { locale: ru });
   const formattedEnd = format(range[0].endDate, "dd MMMM", { locale: ru });
+
+  const handleCloseModal = () => {
+    setShow(false);
+    // When modal closes, check if both dates are selected and trigger change
+    if (range[0].startDate && range[0].endDate) {
+      handleChange?.({
+        startDate: range[0].startDate,
+        endDate: range[0].endDate,
+      });
+    }
+  };
+
   return (
     <div className="flex xl:col-span-1 lg:col-span-3 relative bg-white border border-gray-300 items-center rounded justify-between grow whitespace-nowrap">
       <button
@@ -40,12 +52,7 @@ function TabsController({
       </button>
       {show && (
         <>
-          <div
-            onClick={() => {
-              setShow(false);
-            }}
-            className="fixed inset-0 z-[1]"
-          ></div>
+          <div onClick={handleCloseModal} className="fixed inset-0 z-[1]"></div>
           <TabsContent
             className="absolute z-[1] top-[120%] w-fit left-0"
             value={activeTab}
@@ -54,10 +61,13 @@ function TabsController({
               locale={ru}
               onChange={(item) => {
                 setRange([item.selection]);
-                handleChange?.({
-                  startDate: item.selection.startDate,
-                  endDate: item.selection.endDate,
-                });
+                // Only update if both dates are selected
+                if (item.selection.startDate && item.selection.endDate) {
+                  handleChange?.({
+                    startDate: item.selection.startDate,
+                    endDate: item.selection.endDate,
+                  });
+                }
               }}
               moveRangeOnFirstSelection={false}
               ranges={range}

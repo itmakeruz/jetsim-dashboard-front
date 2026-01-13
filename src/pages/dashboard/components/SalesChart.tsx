@@ -22,12 +22,12 @@ export default function SalesChart() {
           <h2 className="text-lg font-bold text-main-black">
             Продажа за {monthlyComparison?.current_month?.name || "месяц"}
           </h2>
-          {currentData.chartDatas.percent && (
+          {currentData.chartDatas.percent !== null && currentData.chartDatas.percent !== undefined && (
             <PercentChange percent={currentData.chartDatas.percent} />
           )}
         </div>
         <div className="text-lg font-bold text-main-black">
-          {formatNumber(currentData.chartDatas.summ)} сум
+          {formatNumber(currentData.chartDatas.summ)} ₽
         </div>
       </div>
 
@@ -49,9 +49,6 @@ export default function SalesChart() {
             formatter={(value, name) => {
               const labels = {
                 total_amount: "Общая сумма",
-                product_amount: "Сумма товаров",
-                simcard_amount: "Сумма сим-карт",
-                orders_count: "Количество заказов",
               };
               return [formatNumber(value), labels[name] || name];
             }}
