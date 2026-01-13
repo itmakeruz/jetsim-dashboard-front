@@ -13,18 +13,22 @@ import {
 } from "recharts";
 
 export default function SalesChart() {
-  const { currentData, monthlyComparison } = useDataContext();
+  const { currentData, monthlyComparison, dateRangeLabel } = useDataContext();
 
   return (
     <div className="bg-white main-shadow rounded p-4 pb-5 col-span-3">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-[10px]">
           <h2 className="text-lg font-bold text-main-black">
-            Продажа за {monthlyComparison?.current_month?.name || "месяц"}
+            Продажа{" "}
+            {dateRangeLabel
+              ? `за ${dateRangeLabel}`
+              : `за ${monthlyComparison?.current_month?.name || "месяц"}`}
           </h2>
-          {currentData.chartDatas.percent !== null && currentData.chartDatas.percent !== undefined && (
-            <PercentChange percent={currentData.chartDatas.percent} />
-          )}
+          {currentData.chartDatas.percent !== null &&
+            currentData.chartDatas.percent !== undefined && (
+              <PercentChange percent={currentData.chartDatas.percent} />
+            )}
         </div>
         <div className="text-lg font-bold text-main-black">
           {formatNumber(currentData.chartDatas.summ)} ₽

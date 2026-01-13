@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 import { dashboardAPI } from "@/lib/api";
 
 const DataContext = createContext<any>(null);
@@ -116,6 +118,36 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     percentage_change: null, // API doesn't provide this
   };
 
+  // Format date range for display
+  const dateRangeLabel = useMemo(() => {
+    if (filters.date_from && filters.date_to) {
+      const startDate = new Date(filters.date_from);
+      const endDate = new Date(filters.date_to);
+
+      // Check if dates are in the same month
+      const isSameMonth =
+        startDate.getMonth() === endDate.getMonth() &&
+        startDate.getFullYear() === endDate.getFullYear();
+
+      if (isSameMonth) {
+        // Same month: "1-15 января"
+        return `${format(startDate, "d", { locale: ru })}-${format(
+          endDate,
+          "d MMMM",
+          { locale: ru }
+        )}`;
+      } else {
+        // Different months: "1 января - 15 февраля"
+        return `${format(startDate, "d MMMM", { locale: ru })} - ${format(
+          endDate,
+          "d MMMM",
+          { locale: ru }
+        )}`;
+      }
+    }
+    return null;
+  }, [filters.date_from, filters.date_to]);
+
   return (
     <DataContext.Provider
       value={{
@@ -124,6 +156,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
         currentData,
         monthlyComparison,
         isLoading,
+        dateRangeLabel,
       }}
     >
       {children}

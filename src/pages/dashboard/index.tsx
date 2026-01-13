@@ -11,9 +11,9 @@ const DashboardContent = () => {
   const { isLoading } = useDataContext();
   // const { user } = useAuthStore();
 
-  if (isLoading) {
-    return <Loader isFullScreen={false} />;
-  }
+  // if (isLoading) {
+  //   return <Loader isFullScreen={false} />;
+  // }
 
   return (
     <div className="flex flex-col gap-4">

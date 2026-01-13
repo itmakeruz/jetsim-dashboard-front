@@ -18,11 +18,16 @@ function TabsController({
 
   const handleCloseModal = () => {
     setShow(false);
-    // When modal closes, check if both dates are selected and trigger change
-    if (range[0].startDate && range[0].endDate) {
+    // When modal closes, check if both dates are selected and different
+    const currentRange = range[0];
+    if (
+      currentRange.startDate &&
+      currentRange.endDate &&
+      currentRange.startDate.getTime() !== currentRange.endDate.getTime()
+    ) {
       handleChange?.({
-        startDate: range[0].startDate,
-        endDate: range[0].endDate,
+        startDate: currentRange.startDate,
+        endDate: currentRange.endDate,
       });
     }
   };
@@ -60,14 +65,9 @@ function TabsController({
             <DateRange
               locale={ru}
               onChange={(item) => {
+                // Only update range state, don't trigger handleChange yet
+                // handleChange will be called when modal closes
                 setRange([item.selection]);
-                // Only update if both dates are selected
-                if (item.selection.startDate && item.selection.endDate) {
-                  handleChange?.({
-                    startDate: item.selection.startDate,
-                    endDate: item.selection.endDate,
-                  });
-                }
               }}
               moveRangeOnFirstSelection={false}
               ranges={range}

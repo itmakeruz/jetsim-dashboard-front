@@ -74,12 +74,17 @@ const Filters = () => {
     });
   };
 
-  // Date range change handler - only update state, don't send request yet
+  // Date range change handler - only called when both dates are fully selected
   const handleDateChange = ({ startDate, endDate }) => {
+    // Only proceed if both dates are provided and different
+    if (!startDate || !endDate || startDate.getTime() === endDate.getTime()) {
+      return;
+    }
+
     const newRange = [
       {
-        startDate: startDate || range[0].startDate,
-        endDate: endDate || range[0].endDate,
+        startDate: startDate,
+        endDate: endDate,
         key: "selection",
       },
     ];
@@ -87,31 +92,15 @@ const Filters = () => {
 
     // Update URL
     const params = new URLSearchParams(searchParams);
-    if (startDate) {
-      params.set("date_from", startDate.toISOString());
-    } else {
-      params.delete("date_from");
-    }
-    if (endDate) {
-      params.set("date_to", endDate.toISOString());
-    } else {
-      params.delete("date_to");
-    }
+    params.set("date_from", startDate.toISOString());
+    params.set("date_to", endDate.toISOString());
     setSearchParams(params, { replace: true });
 
-    // Only update filters if both dates are selected
-    if (startDate && endDate) {
-      setFilters({
-        date_from: startDate.toISOString(),
-        date_to: endDate.toISOString(),
-      });
-    } else {
-      // Clear filters if dates are not complete
-      setFilters({
-        date_from: null,
-        date_to: null,
-      });
-    }
+    // Update filters and send request
+    setFilters({
+      date_from: startDate.toISOString(),
+      date_to: endDate.toISOString(),
+    });
   };
 
   // Initialize filters on mount
