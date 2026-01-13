@@ -347,24 +347,6 @@ function Orders() {
                           </div>
                         )}
 
-                        {sim.tariff.quantity_sms > 0 && (
-                          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                            <div className="flex items-center gap-2">
-                              <div className="p-2 bg-orange-100 rounded-lg">
-                                <MessageSquare className="w-5 h-5 text-orange-600" />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-medium text-gray-500">
-                                  SMS
-                                </label>
-                                <p className="text-base font-bold text-gray-900">
-                                  {sim.tariff.quantity_sms} SMS
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
                         <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                           <div className="flex items-center gap-2">
                             <div className="p-2 bg-indigo-100 rounded-lg">
@@ -388,44 +370,15 @@ function Orders() {
 
                         <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                           <div className="flex items-center gap-2">
-                            <div
-                              className={`p-2 rounded-lg ${
-                                sim.day_left > 7
-                                  ? "bg-green-100"
-                                  : sim.day_left > 3
-                                  ? "bg-yellow-100"
-                                  : "bg-red-100"
-                              }`}
-                            >
-                              <Calendar
-                                className={`w-5 h-5 ${
-                                  sim.day_left > 7
-                                    ? "text-green-600"
-                                    : sim.day_left > 3
-                                    ? "text-yellow-600"
-                                    : "text-red-600"
-                                }`}
-                              />
+                            <div className="p-2 bg-orange-100 rounded-lg">
+                              <MessageSquare className="w-5 h-5 text-orange-600" />
                             </div>
                             <div>
                               <label className="block text-xs font-medium text-gray-500">
-                                Осталось дней
+                                SMS
                               </label>
-                              <p
-                                className={`text-base font-bold ${
-                                  sim.day_left > 7
-                                    ? "text-green-600"
-                                    : sim.day_left > 3
-                                    ? "text-yellow-600"
-                                    : "text-red-600"
-                                }`}
-                              >
-                                {sim.day_left}{" "}
-                                {sim.day_left === 1
-                                  ? "день"
-                                  : sim.day_left < 5
-                                  ? "дня"
-                                  : "дней"}
+                              <p className="text-base font-bold text-gray-900">
+                                {sim.tariff.quantity_sms} SMS
                               </p>
                             </div>
                           </div>
