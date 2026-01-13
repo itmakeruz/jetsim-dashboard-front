@@ -16,16 +16,20 @@ import Loader from "@/components/Loader";
 import { size } from "@/constants/paginationStuffs";
 
 function Transactions() {
-  const [searchValue, setSearchValue] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const [debouncedSearch, setDebouncedSearch] = useState(
+    searchParams.get("search") || ""
+  );
 
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const pageSize = size;
 
   // Fetch transactions with TanStack Query
   const { data: transactionsResponse, isLoading } = useQuery({
-    queryKey: ["transactions", currentPage, debouncedSearch],
+    queryKey: ["transaction", currentPage, debouncedSearch],
     queryFn: () =>
       referenceAPI.getTransactions(debouncedSearch || null, currentPage),
     staleTime: 30000,
@@ -63,7 +67,7 @@ function Transactions() {
           <CustomInput
             divClassname="w-full"
             className="w-full bg-white !border-0"
-            placeholder="Поиск по ID, агенту, пользователю, типу или сообщению"
+            placeholder="Поиск по ID, пользователю или типу"
             name="search"
             type="text"
             value={searchValue}
@@ -79,10 +83,10 @@ function Transactions() {
           <div className="bg-white rounded shadow p-4">
             <UniversalTable
               tableHeadItems={transactionsTableHeadItems}
-              className="grid-cols-[80px_1fr_1fr_120px_100px_100px_2fr_150px] min-w-[800px]"
+              className="grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_100px] min-w-[800px]"
             >
               <TransactionsTbody
-                className="grid-cols-[80px_1fr_1fr_120px_100px_100px_2fr_150px] min-w-[800px]"
+                className="grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_100px] min-w-[800px]"
                 datas={datas}
               />
             </UniversalTable>

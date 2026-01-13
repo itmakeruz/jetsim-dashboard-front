@@ -178,12 +178,12 @@ export const referenceAPI = {
 
     if (search) params.search = search;
     if (page > 1) params.page = page;
-    return axios.get("/transactions", { params });
+    return axios.get("/transaction", { params });
   },
-  createTransaction: (data) => axios.post("/transactions", data),
-  updateTransaction: (id, data) => axios.patch(`/transactions/${id}`, data),
-  deleteTransaction: (id) => axios.delete(`/transactions/${id}`),
-  getTransactionById: (id) => axios.get(`/transactions/${id}`),
+  createTransaction: (data) => axios.post("/transaction", data),
+  updateTransaction: (id, data) => axios.patch(`/transaction/${id}`, data),
+  deleteTransaction: (id) => axios.delete(`/transaction/${id}`),
+  getTransactionById: (id) => axios.get(`/transaction/${id}`),
 
   // Staff (Employees)
   getStaff: () => axios.get("/staff"),

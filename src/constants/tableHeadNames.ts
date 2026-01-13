@@ -40,13 +40,12 @@ export const faqTableHeadItems = ["№", "Вопрос", "Ответ", "Язык
 
 export const transactionsTableHeadItems = [
   "ID",
-  "Агент",
   "Пользователь",
   "Сумма",
   "Тип",
   "Статус",
-  "Сообщение",
   "Дата",
+  "",
 ];
 
 export const tariffsTypesTableHeadItems = [
