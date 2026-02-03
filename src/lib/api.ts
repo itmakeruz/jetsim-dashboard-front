@@ -1,5 +1,15 @@
+import { Transaction, TransactionsListResponse } from "@/types/transactions";
 import axios from "./axios";
-
+export interface GetParams {
+  [key: string]: any;
+  page?: number;
+}
+const getList = <T>(url: string, params: GetParams = {}) => {
+  const { page, ...rest } = params;
+  const finalParams = { ...rest, ...(page && page > 1 ? { page } : {}) };
+  return axios.get<T>(url, { params: finalParams }).then((res) => res.data);
+};
+const get = <T>(url: string) => axios.get<T>(url).then((res) => res.data);
 // Auth API - Exact match from api-data.json
 export const authAPI = {
   login: (data) => axios.post("/auth/login", data),
@@ -167,20 +177,10 @@ export const referenceAPI = {
   },
 
   // Transactions
-  getTransactions: (search: string | null = null, page: number = 1) => {
-    const params: {
-      search?: string | null;
-      page?: number;
-    } = {};
-
-    if (search) params.search = search;
-    if (page > 1) params.page = page;
-    return axios.get("/transaction", { params });
-  },
-  createTransaction: (data) => axios.post("/transaction", data),
-  updateTransaction: (id, data) => axios.patch(`/transaction/${id}`, data),
-  deleteTransaction: (id) => axios.delete(`/transaction/${id}`),
-  getTransactionById: (id) => axios.get(`/transaction/${id}`),
+  getTransactions: (params?: GetParams) =>
+    getList<TransactionsListResponse>("/transaction", params),
+  getTransactionById: (id: string | number) =>
+    get<Transaction>(`/transaction/${id}`),
 
   // Staff (Employees)
   getStaff: () => axios.get("/staff"),
