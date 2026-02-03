@@ -1,33 +1,16 @@
-import {
-  Search,
-  Calendar,
-  Package,
-  CheckCircle2,
-  Wifi,
-  Phone,
-  MessageSquare,
-} from "lucide-react";
-import { useState, useEffect } from "react";
+import { Calendar, Wifi, Phone, MessageSquare } from "lucide-react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { ordersAPI } from "@/lib/api";
 import formatNumber from "@/utils/formatNumber";
+import { formatDate } from "@/utils/dateFormatter";
 
-import CustomInput from "@/components/formElements/CustomInput";
-import UniversalTable from "@/components/tables/UniversalTables";
-import EmptyDatas from "@/components/empty/EmptyDatas";
-import PaginationComp from "@/components/paginations/PaginationComp";
-import Loader from "@/components/Loader";
+import CustomTable from "@/components/tables/CustomTable";
 import UniversalModal from "@/components/modals/UniversalModal";
+import { orderColumns } from "@/constants/tableColumns";
 import { size } from "@/constants/paginationStuffs";
-
-const ordersTableHeadItems = [
-  "ID заказа",
-  "Дата создания",
-  "Количество SIM",
-  "",
-];
 
 interface Tariff {
   id: number;
@@ -58,138 +41,36 @@ interface Order {
 }
 
 function Orders() {
-  const [searchValue, setSearchValue] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const params = Object.fromEntries(searchParams.entries());
+
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const currentPage = parseInt(searchParams.get("page") || "1");
-  const pageSize = size;
-
-  // Fetch orders
-  const { data: ordersResponse, isLoading } = useQuery({
-    queryKey: ["orders", currentPage, debouncedSearch],
-    queryFn: () =>
-      ordersAPI.getOrders({
-        page: currentPage,
-        limit: pageSize,
-        ...(debouncedSearch && { search: debouncedSearch }),
-      }),
+  const { data: response, isLoading } = useQuery({
+    queryKey: ["orders", params],
+    queryFn: () => ordersAPI.getOrders({ size, ...params }),
     staleTime: 30000,
   });
 
-  const datas: Order[] = ordersResponse?.data?.data || [];
-  const meta = ordersResponse?.data?.meta || {};
-  const totalItems = meta.totalItems || 0;
-  const totalPages = meta.totalPage || 1;
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "-";
-    const date = new Date(dateString);
-    return (
-      date.toLocaleDateString("ru-RU") + " " + date.toLocaleTimeString("ru-RU")
-    );
+  const handleRowClick = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
   };
 
-  // Debounce search input
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setDebouncedSearch(searchValue);
-    }, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [searchValue]);
-
-  // Update URL when debounced search changes
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (debouncedSearch) params.set("search", debouncedSearch);
-    else params.delete("search");
-    params.set("page", "1");
-    setSearchParams(params, { replace: true });
-  }, [debouncedSearch]);
-
   return (
-    <div className="flex flex-col gap-6 h-full">
-      {/* Search Section */}
-      <div className="flex gap-4 items-center">
-        <div className="w-full flex items-center bg-white rounded-lg shadow-sm border border-gray-200 max-w-[520px] px-4 py-2 transition-all hover:shadow-md">
-          <Search className="w-4 h-4 text-[#74788D] mr-2 flex-shrink-0" />
-          <CustomInput
-            divClassname="w-full"
-            className="w-full bg-white !border-0 focus:ring-0"
-            placeholder="Поиск по ID заказа"
-            name="search"
-            type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Orders Table */}
-      <div className="relative grow overflow-hidden flex flex-col">
-        {isLoading ? (
-          <Loader isFullScreen={false} />
-        ) : datas?.length > 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex p-4 flex-col h-full">
-            <UniversalTable
-              tableHeadItems={ordersTableHeadItems}
-              className="grid-cols-[1fr_1fr_2fr]"
-            >
-              <div className="divide-y divide-gray-100">
-                {datas.map((order) => (
-                  <div
-                    key={order.id}
-                    className="grid grid-cols-[1fr_1fr_2fr] gap-4 items-center py-2 px-4 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent transition-all duration-200 group"
-                  >
-                    {/* ID заказа */}
-                    <div className="flex items-center">
-                      <div className="flex items-center gap-2">
-                        <Package className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-semibold text-gray-900">
-                          #{order.id}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Дата создания */}
-                    <div className="flex items-center">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span>{formatDate(order.created_at)}</span>
-                      </div>
-                    </div>
-                    {/* Количество SIM */}
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setIsModalOpen(true);
-                        }}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm hover:from-blue-600 hover:to-blue-700 transition-all duration-200 active:scale-95 cursor-pointer"
-                      >
-                        <Package className="w-3.5 h-3.5" />
-                        {order.sims.length} SIM
-                      </button>
-                    </div>
-                    <div></div>
-                  </div>
-                ))}
-              </div>
-            </UniversalTable>
-
-            <div className="border-t border-gray-200 p-0">
-              <PaginationComp
-                current={currentPage}
-                total={totalItems}
-                totalPages={totalPages}
-                limit={pageSize}
-              />
-            </div>
-          </div>
-        ) : (
-          <EmptyDatas />
-        )}
+    <div className="flex flex-col h-full">
+      <div className="bg-white rounded shadow-sm border overflow-hidden h-full">
+        <CustomTable
+          columns={orderColumns}
+          data={response?.data?.data ?? []}
+          isLoading={isLoading}
+          skeletonCount={10}
+          hasPagination={true}
+          pagination={response?.data?.meta}
+          defaultPageSize={response?.data?.meta?.totalSize}
+          onRowClick={handleRowClick}
+        />
       </div>
 
       {/* SIM Cards Modal */}

@@ -98,6 +98,50 @@ export const userColumns: Column[] = [
   },
 ];
 
+// Order columns
+export const orderColumns: Column[] = [
+  {
+    id: "id",
+    header: "ID заказа",
+    render: (value) => (
+      <span className="font-semibold text-gray-900">#{value}</span>
+    ),
+    filter: "input",
+    filterKey: "search",
+    width: 60,
+  },
+  {
+    id: "created_at",
+    header: "Дата создания",
+    render: (value) => (value ? formatDate(value, "ru") : "-"),
+    filter: "date",
+  },
+  {
+    id: "sims",
+    header: "Количество SIM",
+    render: (value) => (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-semibold bg-blue-100 text-blue-700">
+        {value?.length || 0} SIM
+      </span>
+    ),
+  },
+  {
+    id: "sims",
+    header: "Общая сумма",
+    render: (value) => {
+      const total = value?.reduce(
+        (sum: number, sim: any) => sum + (sim.tariff?.price_sell || 0),
+        0
+      );
+      return (
+        <span className="font-semibold text-green-700">
+          {formatNumber(total)} ₽
+        </span>
+      );
+    },
+  },
+];
+
 export const transactionColumns: Column<Transaction>[] = [
   {
     id: "id",
