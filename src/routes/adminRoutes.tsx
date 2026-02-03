@@ -23,6 +23,7 @@ import Transactions from "../pages/settings/transactions";
 // Partners and Users
 import Partners from "../pages/partners";
 import Users from "../pages/users";
+import UserSingle from "../pages/users/pages/UserSingle";
 import Employees from "../pages/employees";
 
 // Support
@@ -33,6 +34,7 @@ const adminRoutes = [
   { path: "/", element: <Dashboard /> },
 
   { path: "/users", element: <Users /> },
+  { path: "/users/view/:id", element: <UserSingle /> },
   { path: "/employees", element: <Employees /> },
   { path: "/partners", element: <Partners /> },
 

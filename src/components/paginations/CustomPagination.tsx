@@ -66,7 +66,7 @@ function CustomPagination({
   }, [currentPage, totalPage, siblingCount]);
 
   // Early return hooklar dan KEYIN bo'lishi kerak
-  if (totalPage <= 1) return null;
+  if (totalPage <= 0) return null;
 
   return (
     <div className="flex justify-end items-center gap-4 pb-4 pr-4 text-sm">

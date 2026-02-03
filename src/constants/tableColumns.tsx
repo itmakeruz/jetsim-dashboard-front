@@ -3,10 +3,100 @@ import { Column } from "@/components/tables/tableType";
 import { Transaction } from "@/types/transactions";
 import { formatDate } from "@/utils/dateFormatter";
 import formatNumber from "@/utils/formatNumber";
+import { formatPhoneNumber } from "@/utils/phoneNumberFormatter";
+import { getImageUrl } from "@/utils/imageUtils";
+import { Link } from "react-router-dom";
 import {
   TRANSACTION_STATUS_CLASSES,
   TRANSACTION_STATUS_OPTIONS,
 } from "./statusOptions";
+
+// Helper functions for user avatar
+const getInitials = (name: string) => {
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+};
+
+const stringToColor = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const color = Math.floor(
+    Math.abs((Math.sin(hash) * 16777215) % 16777215)
+  ).toString(16);
+  return "#" + "0".repeat(6 - color.length) + color;
+};
+
+// User columns
+export const userColumns: Column[] = [
+  {
+    id: "id",
+    header: "ID",
+    filter: "input",
+    filterKey: "search",
+    width: 60,
+  },
+  {
+    id: "name",
+    header: "Имя",
+    render: (value, row) => (
+      <div className="flex items-center gap-2">
+        {row?.image ? (
+          <img
+            src={getImageUrl(row.image)}
+            alt={value || "User"}
+            className="w-8 h-8 shrink-0 rounded-full object-cover"
+          />
+        ) : value ? (
+          <div
+            className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-white font-semibold uppercase"
+            style={{ backgroundColor: stringToColor(value) }}
+          >
+            {getInitials(value)}
+          </div>
+        ) : (
+          <img
+            src="https://static.vecteezy.com/system/resources/previews/046/010/545/non_2x/user-icon-simple-design-free-vector.jpg"
+            alt="Default user"
+            className="w-8 h-8 shrink-0 rounded-full object-cover"
+          />
+        )}
+        <span className="text-base text-main-black font-medium">
+          {value || "Неизвестный пользователь"}
+        </span>
+      </div>
+    ),
+    filter: "input",
+  },
+  {
+    id: "email",
+    header: "Email",
+    render: (value) => (
+      <Link to={`mailto:${value}`} className="text-blue-600 font-medium">
+        {value}
+      </Link>
+    ),
+    filter: "input",
+  },
+  {
+    id: "phone_number",
+    header: "Телефон",
+    render: (value) => (
+      <Link to={`tel:${value}`} className="text-gray-600">
+        {formatPhoneNumber(value) || "—"}
+      </Link>
+    ),
+    filter: "input",
+  },
+  {
+    id: "created_at",
+    header: "Дата",
+    render: (value) => (value ? formatDate(value, "ru") : "-"),
+    filter: "date",
+  },
+];
 
 export const transactionColumns: Column<Transaction>[] = [
   {

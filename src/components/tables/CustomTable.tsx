@@ -22,7 +22,6 @@ function CustomTable({
   onRowClick,
 }: CustomTableProps) {
   const hasActions = !!viewPath || !!onRowClick;
-  console.log(pagination);
 
   return (
     <div className="flex flex-col h-full gap-2 px-2 whitespace-nowrap">
@@ -86,7 +85,7 @@ function CustomTable({
       </div>
       {hasPagination && !isLoading && (
         <CustomPagination
-          totalPage={pagination?.totalPage ?? 0}
+          totalPage={pagination?.totalPage ?? 1}
           disabled={isLoading}
           defaultPageSize={defaultPageSize}
         />

@@ -1,4 +1,5 @@
 import { Transaction, TransactionsListResponse } from "@/types/transactions";
+import { UsersListResponse } from "@/types/users";
 import axios from "./axios";
 export interface GetParams {
   [key: string]: any;
@@ -165,16 +166,8 @@ export const referenceAPI = {
   deletePartner: (id) => axios.delete(`/partner/${id}`),
 
   // Users
-  getUsers: (search: string | null = null, page: number = 1) => {
-    const params: {
-      search?: string | null;
-      page?: number;
-    } = {};
-
-    if (search) params.search = search;
-    if (page > 1) params.page = page;
-    return axios.get("/users", { params });
-  },
+  getUsers: (params?: GetParams) => getList<UsersListResponse>("/users", params),
+  getUserById: (id: string | number) => axios.get(`/users/${id}`),
 
   // Transactions
   getTransactions: (params?: GetParams) =>
