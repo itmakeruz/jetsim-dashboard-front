@@ -1,8 +1,9 @@
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import CustomPagination from "../paginations/CustomPagination";
 import { emptyTable } from "./images";
 import SkeletonRow from "./SkeletonRow";
-import { Eye } from "lucide-react";
+import { Eye, FileDown, Maximize2, Minimize2 } from "lucide-react";
 import TableHead from "./TableHead";
 import { CustomTableProps } from "./tableType";
 
@@ -20,11 +21,70 @@ function CustomTable({
   defaultPageSize = 20,
   viewPath,
   onRowClick,
+  showExcelButton = false,
+  onExcelExport,
+  showFullscreenButton = false,
 }: CustomTableProps) {
   const hasActions = !!viewPath || !!onRowClick;
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
 
-  return (
+  const handleFullscreen = () => {
+    if (!tableWrapperRef.current) return;
+    if (!document.fullscreenElement) {
+      tableWrapperRef.current.requestFullscreen?.();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen?.();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const showToolbar = showExcelButton || showFullscreenButton;
+
+  const tableContent = (
     <div className="flex flex-col h-full gap-2 px-2 whitespace-nowrap">
+      {showToolbar && (
+        <div className="flex items-center justify-end gap-2 py-1 border-b border-gray-100">
+          {showExcelButton && (
+            <button
+              type="button"
+              onClick={onExcelExport}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition"
+            >
+              <FileDown className="w-4 h-4" />
+              Excel
+            </button>
+          )}
+          {showFullscreenButton && (
+            <button
+              type="button"
+              onClick={handleFullscreen}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition"
+            >
+              {isFullscreen ? (
+                <>
+                  <Minimize2 className="w-4 h-4" />
+                  Kichiklashtirish
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-4 h-4" />
+                  To‘liq ekran
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      )}
       <div className="grow overflow-auto scroll-bar-gutter">
         <table className="w-full border-collapse">
           <TableHead columns={columns} hasActions={hasActions} />
@@ -90,6 +150,12 @@ function CustomTable({
           defaultPageSize={defaultPageSize}
         />
       )}
+    </div>
+  );
+
+  return (
+    <div ref={tableWrapperRef} className="flex flex-col h-full min-h-0 bg-white">
+      {tableContent}
     </div>
   );
 }

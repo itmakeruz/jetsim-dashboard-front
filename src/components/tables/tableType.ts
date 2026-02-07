@@ -25,4 +25,10 @@ export type CustomTableProps<T = any> = {
   defaultPageSize?: number;
   viewPath?: string; // Masalan: "/orders/view" yoki "/users/drivers/view"
   onRowClick?: (row: T) => void; // Qatorni bosganda
+  /** Excel yuklash tugmasi ko‘rinsin (masalan Transactions sahifasida) */
+  showExcelButton?: boolean;
+  /** Excel tugmasi bosilganda (API so‘rovi keyinroq ulanganadi) */
+  onExcelExport?: () => void;
+  /** To‘liq ekran tugmasi ko‘rinsin */
+  showFullscreenButton?: boolean;
 };
