@@ -17,9 +17,26 @@ function Transactions() {
     staleTime: 30000,
   });
 
-  const handleExcelExport = () => {
-    // API so‘rovi keyinroq ulanadi
-    // referenceAPI.exportTransactionsExcel(params) kabi
+  const handleExcelExport = async () => {
+    try {
+      const { data } = await referenceAPI.getTransactionsExcel({
+        size: size,
+        ...params,
+      });
+      const url = URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `transactions-${new Date().toISOString().slice(0, 10)}.xlsx`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Excel yuklash xatosi:", err);
+    }
   };
 
   return (

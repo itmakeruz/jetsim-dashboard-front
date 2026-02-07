@@ -166,7 +166,8 @@ export const referenceAPI = {
   deletePartner: (id) => axios.delete(`/partner/${id}`),
 
   // Users
-  getUsers: (params?: GetParams) => getList<UsersListResponse>("/users", params),
+  getUsers: (params?: GetParams) =>
+    getList<UsersListResponse>("/users", params),
   getUserById: (id: string | number) => axios.get(`/users/${id}`),
 
   // Transactions
@@ -174,6 +175,8 @@ export const referenceAPI = {
     getList<TransactionsListResponse>("/transaction", params),
   getTransactionById: (id: string | number) =>
     get<Transaction>(`/transaction/${id}`),
+  getTransactionsExcel: (params?: GetParams) =>
+    axios.get("/transaction/export/excel", { params, responseType: "blob" }),
 
   // Staff (Employees)
   getStaff: () => axios.get("/staff"),

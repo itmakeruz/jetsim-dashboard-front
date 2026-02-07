@@ -103,7 +103,7 @@ export const orderColumns: Column[] = [
     id: "id",
     header: "ID заказа",
     render: (value) => (
-      <span className="font-semibold text-gray-900">#{value}</span>
+      <span className="font-semibold text-gray-900">{value}</span>
     ),
     filter: "input",
     width: 60,
@@ -170,6 +170,17 @@ export const transactionColumns: Column<Transaction>[] = [
       />
     ),
     filter: { type: "select", options: TRANSACTION_STATUS_OPTIONS },
+  },
+  {
+    id: "order_id",
+    header: "ID заказа",
+    filter: "input",
+    width: 40,
+    render: (value) => (
+      <Link to={`/orders?id=${value}`} className="text-blue-600 font-medium">
+        {value}
+      </Link>
+    ),
   },
   {
     id: "created_at",
