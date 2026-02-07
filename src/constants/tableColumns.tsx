@@ -123,6 +123,18 @@ export const orderColumns: Column[] = [
       </span>
     ),
   },
+  // {
+  //   id: "status",
+  //   header: "Статус",
+  //   render: (value: string) => (
+  //     <StatusBadge
+  //       options={TRANSACTION_STATUS_OPTIONS}
+  //       status={value}
+  //       classes={TRANSACTION_STATUS_CLASSES}
+  //     />
+  //   ),
+  //   filter: { type: "select", options: TRANSACTION_STATUS_OPTIONS },
+  // },
   {
     id: "sims",
     header: "Общая сумма",
