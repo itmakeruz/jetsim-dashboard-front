@@ -35,7 +35,6 @@ export const userColumns: Column[] = [
     id: "id",
     header: "ID",
     filter: "input",
-    filterKey: "search",
     width: 60,
   },
   {
@@ -107,7 +106,6 @@ export const orderColumns: Column[] = [
       <span className="font-semibold text-gray-900">#{value}</span>
     ),
     filter: "input",
-    filterKey: "search",
     width: 60,
   },
   {
@@ -147,7 +145,6 @@ export const transactionColumns: Column<Transaction>[] = [
     id: "id",
     header: "ID",
     filter: "input",
-    filterKey: "search",
     width: 40,
   },
   {
