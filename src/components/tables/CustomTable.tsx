@@ -45,7 +45,8 @@ function CustomTable({
       setIsFullscreen(!!document.fullscreenElement);
     };
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
   const showToolbar = showExcelButton || showFullscreenButton;
@@ -154,7 +155,10 @@ function CustomTable({
   );
 
   return (
-    <div ref={tableWrapperRef} className="flex flex-col h-full min-h-0 bg-white">
+    <div
+      ref={tableWrapperRef}
+      className="flex flex-col h-full min-h-0 bg-white"
+    >
       {tableContent}
     </div>
   );

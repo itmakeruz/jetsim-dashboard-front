@@ -1,13 +1,13 @@
 // Transaction status options
 export const TRANSACTION_STATUS_OPTIONS = [
-  { value: "PENDING", label: "В ожидании" },
-  { value: "SUCCESS", label: "Успешно" },
+  { value: "CREATED", label: "Создано" },
+  { value: "COMPLETED", label: "Завершено" },
   { value: "FAILED", label: "Неуспешно" },
   { value: "ERROR", label: "Ошибка" },
 ];
 export const TRANSACTION_STATUS_CLASSES: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-700", // В ожидании
-  SUCCESS: "bg-green-100 text-green-700", // Успешно
+  CREATED: "bg-yellow-100 text-yellow-700", // В ожидании
+  COMPLETED: "bg-blue-100 text-blue-700", // Завершено
   FAILED: "bg-red-100 text-red-700", // Неуспешно
   ERROR: "bg-gray-100 text-gray-700", // Ошибка
 };

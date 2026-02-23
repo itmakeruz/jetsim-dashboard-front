@@ -4,7 +4,8 @@ export type FilterType =
   | "input"
   | "select"
   | "date"
-  | { type: "select"; options: { value: string; label: string }[] };
+  | { type: "select"; options: { value: string; label: string }[] }
+  | { type: "dateRange"; startKey: string; endKey: string };
 
 export type Column<T = any> = {
   id: string;
@@ -31,4 +32,12 @@ export type CustomTableProps<T = any> = {
   onExcelExport?: () => void;
   /** To‘liq ekran tugmasi ko‘rinsin */
   showFullscreenButton?: boolean;
+  /** Filtr boshlanish sanasi (toolbar ichida ko‘rsatiladi) */
+  startDate?: string;
+  /** Filtr tugash sanasi (toolbar ichida ko‘rsatiladi) */
+  endDate?: string;
+  /** Sana filtr inputlari va tozalash (toolbar ichida) */
+  onStartDateChange?: (value: string) => void;
+  onEndDateChange?: (value: string) => void;
+  onClearDateFilter?: () => void;
 };

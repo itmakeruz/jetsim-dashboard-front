@@ -109,10 +109,27 @@ export const orderColumns: Column[] = [
     width: 60,
   },
   {
+    id: "status",
+    header: "Статус",
+    render: (value: string) => (
+      <StatusBadge
+        options={TRANSACTION_STATUS_OPTIONS}
+        status={value}
+        classes={TRANSACTION_STATUS_CLASSES}
+      />
+    ),
+    filter: { type: "select", options: TRANSACTION_STATUS_OPTIONS },
+  },
+  {
     id: "created_at",
-    header: "Дата создания",
-    render: (value) => (value ? formatDate(value, "ru") : "-"),
-    filter: "date",
+    header: "Sana oraligʻi",
+    filter: { type: "dateRange", startKey: "startDate", endKey: "endDate" },
+    render: (value) =>
+      value ? (
+        <div className="text-center">{formatDate(value, "ru")}</div>
+      ) : (
+        "-"
+      ),
   },
   {
     id: "sims",
@@ -123,18 +140,7 @@ export const orderColumns: Column[] = [
       </span>
     ),
   },
-  // {
-  //   id: "status",
-  //   header: "Статус",
-  //   render: (value: string) => (
-  //     <StatusBadge
-  //       options={TRANSACTION_STATUS_OPTIONS}
-  //       status={value}
-  //       classes={TRANSACTION_STATUS_CLASSES}
-  //     />
-  //   ),
-  //   filter: { type: "select", options: TRANSACTION_STATUS_OPTIONS },
-  // },
+
   {
     id: "sims",
     header: "Общая сумма",
@@ -196,8 +202,13 @@ export const transactionColumns: Column<Transaction>[] = [
   },
   {
     id: "created_at",
-    header: "Дата",
-    render: (value) => (value ? formatDate(value, "ru") : "-"),
-    filter: "date",
+    header: "Sana oraligʻi",
+    filter: { type: "dateRange", startKey: "startDate", endKey: "endDate" },
+    render: (value) =>
+      value ? (
+        <div className="text-center">{formatDate(value, "ru")}</div>
+      ) : (
+        "-"
+      ),
   },
 ];

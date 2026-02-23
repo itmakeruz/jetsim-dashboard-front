@@ -12,7 +12,7 @@ function Transactions() {
   const params = Object.fromEntries(searchParams.entries());
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ["drivers", params],
+    queryKey: ["transactions", params],
     queryFn: () => referenceAPI.getTransactions({ size: size, ...params }),
     staleTime: 30000,
   });
