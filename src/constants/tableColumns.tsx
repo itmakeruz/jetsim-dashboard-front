@@ -7,6 +7,8 @@ import { formatPhoneNumber } from "@/utils/phoneNumberFormatter";
 import { getImageUrl } from "@/utils/imageUtils";
 import { Link } from "react-router-dom";
 import {
+  ORDER_STATUS_OPTIONS,
+  ORDER_STATUS_CLASSES,
   TRANSACTION_STATUS_CLASSES,
   TRANSACTION_STATUS_OPTIONS,
 } from "./statusOptions";
@@ -113,9 +115,9 @@ export const orderColumns: Column[] = [
     header: "Статус",
     render: (value: string) => (
       <StatusBadge
-        options={TRANSACTION_STATUS_OPTIONS}
+        options={ORDER_STATUS_OPTIONS}
         status={value}
-        classes={TRANSACTION_STATUS_CLASSES}
+        classes={ORDER_STATUS_CLASSES}
       />
     ),
     filter: { type: "select", options: TRANSACTION_STATUS_OPTIONS },
