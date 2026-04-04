@@ -17,7 +17,7 @@ function UserSingle() {
     enabled: !!id,
   });
 
-  const user = response?.data;
+  const user = response?.data?.data;
 
   if (isLoading) {
     return <Loader isFullScreen={false} />;
