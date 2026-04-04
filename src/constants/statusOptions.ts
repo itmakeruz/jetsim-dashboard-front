@@ -24,3 +24,12 @@ export const TRANSACTION_STATUS_CLASSES: Record<string, string> = {
   FAILED: "bg-red-100 text-red-700", // Неуспешно
   ERROR: "bg-gray-100 text-gray-700", // Ошибка
 };
+// Transaction status options
+export const VERIFICATION_STATUS_OPTIONS = [
+  { value: "true", label: "Да" },
+  { value: "false", label: "Нет" },
+];
+export const VERIFICATION_STATUS_CLASSES: Record<string, string> = {
+  true: "bg-blue-100 text-blue-700", // Да
+  false: "bg-red-100 text-red-700", // Нет
+};

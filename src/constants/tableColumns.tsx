@@ -11,6 +11,8 @@ import {
   ORDER_STATUS_CLASSES,
   TRANSACTION_STATUS_CLASSES,
   TRANSACTION_STATUS_OPTIONS,
+  VERIFICATION_STATUS_OPTIONS,
+  VERIFICATION_STATUS_CLASSES,
 } from "./statusOptions";
 
 // Helper functions for user avatar
@@ -90,6 +92,24 @@ export const userColumns: Column[] = [
       </Link>
     ),
     filter: "input",
+  },
+  {
+    id: "is_verified",
+    header: "Подтвержден",
+    render: (value: string) => (
+      <StatusBadge
+        options={VERIFICATION_STATUS_OPTIONS}
+        status={value.toString()}
+        classes={VERIFICATION_STATUS_CLASSES}
+      />
+    ),
+    filter: {
+      type: "select",
+      options: [
+        { value: "true", label: "Да" },
+        { value: "false", label: "Нет" },
+      ],
+    },
   },
   {
     id: "created_at",
