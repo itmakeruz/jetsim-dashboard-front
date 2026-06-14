@@ -1,82 +1,59 @@
-import { hasRole } from "./sidebarFilter";
+const FULL_ACCESS_ROLES = ["SUPER_ADMIN", "ADMIN"];
+
+const ROLE_ALLOWED_PATHS = {
+  AGENT: ["/"],
+  ACCOUNTANT: ["/"],
+  PRE_ACCOUNTANT: ["/"],
+};
+
+const getUserRole = (user) => user?.role || "";
+
+const isPathAllowed = (path, allowedPaths) =>
+  allowedPaths.some((allowedPath) => {
+    if (allowedPath === "/") return path === "/";
+    return path === allowedPath || path.startsWith(`${allowedPath}/`);
+  });
 
 // Function to check if a route is accessible for a specific user role
 export const isRouteAccessible = (path, user) => {
-  if (!user) return true; // If no user, allow access (will be handled by ProtectedRoute)
+  if (!user) return true; // ProtectedRoute handles unauthenticated users.
 
-  const isTuragent = hasRole(user, "Turagent");
-  const isManager = hasRole(user, "manager");
+  const role = getUserRole(user);
+  if (FULL_ACCESS_ROLES.includes(role)) return true;
 
-  if (!isTuragent && !isManager) return true; // If not Turagent, allow all routes
+  const allowedPaths = ROLE_ALLOWED_PATHS[role] || ["/"];
 
-  // For Turagent role, block specific routes
-  const blockedRoutesForTuragent = [
-    "/contractors",
-    // "/reports",
-    "/branches",
-    "/warehouse",
-    "/reference-tables",
-    "/site",
-    "/settings",
-    "/product-orders",
-    "/quick-order",
-  ];
-  // For Turagent role, block specific routes
-  const blockedRoutesForManager = [
-    "/contractors",
-    "/branches",
-    "/warehouse",
-    "/reference-tables",
-    "/site",
-    "/settings",
-    "/quick-order",
-  ];
-
-  if (isTuragent) {
-    // Check if the current path matches any blocked route
-    const isBlocked = blockedRoutesForTuragent.some(
-      (blockedRoute) =>
-        !path.startsWith(`/reference-tables/clients/`) &&
-        path.startsWith(blockedRoute)
-    );
-
-    return !isBlocked;
-  }
-
-  if (isManager) {
-    // Check if the current path matches any blocked route
-    const isBlocked = blockedRoutesForManager.some((blockedRoute) =>
-      path.startsWith(blockedRoute)
-    );
-
-    return !isBlocked;
-  }
+  return isPathAllowed(path, allowedPaths);
 };
 
 // Function to filter routes based on user role
 export const filterRoutesByRole = (routes, user) => {
   if (!user) return routes;
 
-  const isTuragent = hasRole(user, "Turagent");
+  const role = getUserRole(user);
+  if (FULL_ACCESS_ROLES.includes(role)) return routes;
 
-  if (!isTuragent) return routes;
-
-  // For Turagent role, filter out blocked routes
   return routes.filter((route) => {
-    // Check main route
     if (!isRouteAccessible(route.path, user)) {
       return false;
     }
 
-    // Check children routes
     if (route.children) {
-      route.children = route.children.filter((child) =>
+      const children = route.children.filter((child) =>
         isRouteAccessible(child.path, user)
       );
-      // Only show parent if it has visible children
-      return route.children.length > 0;
+      return children.length > 0;
     }
 
     return true;
+  }).map((route) => {
+    if (!route.children) return route;
+
+    return {
+      ...route,
+      children: route.children.filter((child) =>
+        isRouteAccessible(child.path, user)
+      ),
+    };
   });
 };

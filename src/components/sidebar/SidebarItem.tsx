@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import getColorClasses from "../../utils/getColorClasses";
 
-const SidebarItem = ({ icon: Icon, label, path, count, keyWord }) => {
+const SidebarItem = ({ icon: Icon, label, path }) => {
   const baseStyle =
     "flex items-center justify-between gap-[10px] p-[14px_20px] pr-[15px] font-medium text-[14px]";
   const activeStyle = "bg-white text-main-orange";
