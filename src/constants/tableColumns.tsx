@@ -234,3 +234,74 @@ export const transactionColumns: Column<Transaction>[] = [
       ),
   },
 ];
+
+const PROMOCODE_STATUS_CLASSES = {
+  ACTIVE: "bg-green-100 text-green-700",
+  INACTIVE: "bg-gray-100 text-gray-700",
+};
+
+const PROMOCODE_STATUS_OPTIONS = [
+  { value: "ACTIVE", label: "Активный" },
+  { value: "INACTIVE", label: "Неактивный" },
+];
+
+export const promocodeColumns: Column[] = [
+  {
+    id: "code",
+    header: "Промокод",
+    filter: "input",
+    filterKey: "search",
+    render: (value) => (
+      <span className="font-semibold text-gray-900">{value || "-"}</span>
+    ),
+  },
+  {
+    id: "status",
+    header: "Статус",
+    filter: { type: "select", options: PROMOCODE_STATUS_OPTIONS },
+    render: (value: string) => (
+      <StatusBadge
+        options={PROMOCODE_STATUS_OPTIONS}
+        status={value}
+        classes={PROMOCODE_STATUS_CLASSES}
+      />
+    ),
+  },
+  {
+    id: "used_count",
+    header: "Использовано",
+    render: (value, row) => (
+      <span>
+        {value ?? 0}
+        {row?.usage_limit ? ` / ${row.usage_limit}` : ""}
+      </span>
+    ),
+  },
+  {
+    id: "client_discount_amount",
+    header: "Скидка клиента",
+    render: (value) => (value ? `${formatNumber(value)} ₽` : "-"),
+  },
+  {
+    id: "agent_credit_amount",
+    header: "Начисление агенту",
+    render: (value) => (value ? `${formatNumber(value)} ₽` : "-"),
+  },
+  {
+    id: "agent.name",
+    header: "Агент",
+    filter: "input",
+    filterKey: "agent_id",
+    render: (value, row) => value || row?.agent?.login || "-",
+  },
+  {
+    id: "expires_at",
+    header: "Действует до",
+    render: (value) => (value ? formatDate(value, "ru") : "-"),
+  },
+  {
+    id: "created_at",
+    header: "Создан",
+    render: (value) => (value ? formatDate(value, "ru") : "-"),
+  },
+];

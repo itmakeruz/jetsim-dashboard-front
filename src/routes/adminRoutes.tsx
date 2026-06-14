@@ -25,6 +25,8 @@ import Partners from "../pages/partners";
 import Users from "../pages/users";
 import UserSingle from "../pages/users/pages/UserSingle";
 import Employees from "../pages/employees";
+import Promocodes from "../pages/promocodes";
+import PromocodeSettings from "../pages/promocodes/settings";
 
 // Support
 import Operators from "../pages/support/operators";
@@ -37,6 +39,8 @@ const adminRoutes = [
   { path: "/users/view/:id", element: <UserSingle /> },
   { path: "/employees", element: <Employees /> },
   { path: "/partners", element: <Partners /> },
+  { path: "/promocodes", element: <Promocodes /> },
+  { path: "/promocodes/settings", element: <PromocodeSettings /> },
 
   // Справочные таблицы
 

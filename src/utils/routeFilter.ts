@@ -1,17 +1,28 @@
 const FULL_ACCESS_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
 const ROLE_ALLOWED_PATHS = {
-  AGENT: ["/"],
+  AGENT: ["/promocodes"],
   ACCOUNTANT: ["/"],
   PRE_ACCOUNTANT: ["/"],
 };
 
 const getUserRole = (user) => user?.role || "";
 
+export const getDefaultRouteByRole = (user) => {
+  const role = getUserRole(user);
+  if (role === "AGENT") return "/promocodes";
+
+  return "/";
+};
+
 const isPathAllowed = (path, allowedPaths) =>
   allowedPaths.some((allowedPath) => {
     if (allowedPath === "/") return path === "/";
-    return path === allowedPath || path.startsWith(`${allowedPath}/`);
+    if (allowedPath.endsWith("/*")) {
+      const basePath = allowedPath.slice(0, -2);
+      return path === basePath || path.startsWith(`${basePath}/`);
+    }
+    return path === allowedPath;
   });
 
 // Function to check if a route is accessible for a specific user role

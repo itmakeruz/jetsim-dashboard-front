@@ -11,8 +11,9 @@ import {
   Headset,
   FolderOpen,
   Users2,
-  User,
   IdCardIcon,
+  Settings,
+  TicketPercent,
 } from "lucide-react";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 
@@ -87,6 +88,22 @@ const adminMenu = [
     path: "/partners",
     label: "Партнеры",
     icon: UserCog,
+  },
+  {
+    label: "Промокоды",
+    icon: TicketPercent,
+    children: [
+      {
+        path: "/promocodes",
+        label: "Промокоды",
+        icon: TicketPercent,
+      },
+      {
+        path: "/promocodes/settings",
+        label: "Настройки",
+        icon: Settings,
+      },
+    ],
   },
 ];
 

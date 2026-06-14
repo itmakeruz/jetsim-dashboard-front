@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import Loader from "./Loader";
-import { isRouteAccessible } from "@/utils/routeFilter";
+import { getDefaultRouteByRole, isRouteAccessible } from "@/utils/routeFilter";
 import Error404 from "./Error404";
 import { toast } from "react-toastify";
 
@@ -38,6 +38,11 @@ export default function ProtectedRoute() {
 
   if (!isAuthorized) {
     return <Navigate to="/login" />;
+  }
+
+  const defaultRoute = getDefaultRouteByRole(user);
+  if (location.pathname === "/" && defaultRoute !== "/") {
+    return <Navigate to={defaultRoute} replace />;
   }
 
   if (!isRouteAccessible(location.pathname, user)) {

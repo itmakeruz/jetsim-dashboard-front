@@ -183,6 +183,12 @@ export const referenceAPI = {
   createStaff: (data) => axios.post("/staff", data),
   updateStaff: (id, data) => axios.patch(`/staff/${id}`, data),
   deleteStaff: (id) => axios.delete(`/staff/${id}`),
+
+  // Promocodes
+  getMyPromocodes: (params?: GetParams) =>
+    axios.get("/promocode/my", { params }),
+  getPromocodeSettings: () => axios.get("/promocode/settings"),
+  updatePromocodeSettings: (data) => axios.patch("/promocode/settings", data),
 };
 
 // Support API
