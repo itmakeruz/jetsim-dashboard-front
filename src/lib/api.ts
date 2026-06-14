@@ -187,6 +187,7 @@ export const referenceAPI = {
   // Promocodes
   getMyPromocodes: (params?: GetParams) =>
     axios.get("/promocode/my", { params }),
+  createMyPromocode: (data) => axios.post("/promocode/my", data),
   getPromocodeSettings: () => axios.get("/promocode/settings"),
   updatePromocodeSettings: (data) => axios.patch("/promocode/settings", data),
 };

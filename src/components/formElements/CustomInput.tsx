@@ -1,5 +1,9 @@
 import CustomLabel from "./CustomLabel";
-interface CustomInputProps {
+interface CustomInputProps
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "value" | "defaultValue" | "onChange" | "type"
+  > {
   type?: string;
   placeholder?: string;
   value?: string;
