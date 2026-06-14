@@ -15,12 +15,23 @@ const statusOptions = [
   { id: "INACTIVE", name: "Неактивный" },
 ];
 
-function EmployeesForm({ formData, setFormData }: EmployeesFormProps) {
+const roleOptions = [
+  { id: "SUPER_ADMIN", label: "Супер администратор" },
+  { id: "ADMIN", label: "Администратор" },
+  { id: "ACCOUNTANT", label: "Бухгалтер" },
+  { id: "PRE_ACCOUNTANT", label: "Помощник бухгалтера" },
+  { id: "AGENT", label: "Агент" },
+];
+
+const fieldClassName = "flex flex-col gap-2";
+
+function EmployeesForm({ formData, setFormData, editData }: EmployeesFormProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const isEditMode = Boolean(editData);
 
   return (
-    <div className="space-y-4">
-      <div>
+    <div className="flex flex-col gap-4">
+      <div className={fieldClassName}>
         <CustomLabel labelText="Имя" />
         <CustomInput
           value={formData.name}
@@ -28,7 +39,7 @@ function EmployeesForm({ formData, setFormData }: EmployeesFormProps) {
           placeholder="Введите имя"
         />
       </div>
-      <div>
+      <div className={fieldClassName}>
         <CustomLabel labelText="Логин" />
         <CustomInput
           value={formData.login}
@@ -36,7 +47,7 @@ function EmployeesForm({ formData, setFormData }: EmployeesFormProps) {
           placeholder="Введите логин"
         />
       </div>
-      <div>
+      <div className={fieldClassName}>
         <CustomLabel labelText="Пароль" />
         <div className="relative">
           <CustomInput
@@ -46,6 +57,7 @@ function EmployeesForm({ formData, setFormData }: EmployeesFormProps) {
               setFormData({ ...formData, password: e.target.value })
             }
             placeholder="Введите пароль"
+            required={!isEditMode}
             divClassname=""
           />
           <button
@@ -63,7 +75,18 @@ function EmployeesForm({ formData, setFormData }: EmployeesFormProps) {
         </div>
       </div>
 
-      <div>
+      <div className={fieldClassName}>
+        <CustomLabel labelText="Роль" />
+        <CustomSelect
+          value={formData.role}
+          options={roleOptions}
+          placeholder="Выберите роль"
+          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          name="role"
+        />
+      </div>
+
+      <div className={fieldClassName}>
         <CustomLabel labelText="Статус" />
         <CustomSelect
           value={formData.status}

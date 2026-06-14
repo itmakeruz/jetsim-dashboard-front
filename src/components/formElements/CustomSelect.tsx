@@ -37,7 +37,7 @@ const CustomSelect = ({
       >
         <SelectTrigger
           className={`${className} border w-full outline-none px-4 border-[rgb(116,120,141,0.35)] py-3 rounded text-sm 
-        max-w-[320px] 
+
          `}
         >
           {loading ? (

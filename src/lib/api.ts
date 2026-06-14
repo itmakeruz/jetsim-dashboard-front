@@ -112,7 +112,7 @@ export const referenceAPI = {
   getRegions: (
     search?: string | null,
     page: number = 1,
-    size: number = 500
+    size: number = 500,
   ) => {
     const params: {
       search?: string | null;
@@ -181,7 +181,7 @@ export const referenceAPI = {
   // Staff (Employees)
   getStaff: () => axios.get("/staff"),
   createStaff: (data) => axios.post("/staff", data),
-  updateStaff: (id, data) => axios.put(`/staff/${id}`, data),
+  updateStaff: (id, data) => axios.patch(`/staff/${id}`, data),
   deleteStaff: (id) => axios.delete(`/staff/${id}`),
 };
 
@@ -195,11 +195,11 @@ export const supportAPI = {
   updateOperator: (id, data) =>
     axios.put(
       `https://support-api.jetsim.ru/chat/dashboard/operators/${id}`,
-      data
+      data,
     ),
   deleteOperator: (id) =>
     axios.delete(
-      `https://support-api.jetsim.ru/chat/dashboard/operators/${id}`
+      `https://support-api.jetsim.ru/chat/dashboard/operators/${id}`,
     ),
 
   // Categories
@@ -210,7 +210,7 @@ export const supportAPI = {
   updateCategory: (id, data) =>
     axios.put(
       `https://support-api.jetsim.ru/chat/dashboard/category/${id}`,
-      data
+      data,
     ),
   deleteCategory: (id) =>
     axios.delete(`https://support-api.jetsim.ru/chat/dashboard/category/${id}`),

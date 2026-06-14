@@ -60,7 +60,7 @@ function Employees() {
     ? datas.filter(
         (item: any) =>
           item.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          item.login?.toLowerCase().includes(debouncedSearch.toLowerCase())
+          item.login?.toLowerCase().includes(debouncedSearch.toLowerCase()),
       )
     : datas;
 
@@ -121,7 +121,11 @@ function Employees() {
     e.preventDefault();
 
     if (isEditMode) {
-      updateMutation.mutate({ id: selectedData.id, data: formData });
+      const updateData = { ...formData };
+      if (!updateData.password) {
+        delete updateData.password;
+      }
+      updateMutation.mutate({ id: selectedData.id, data: updateData });
     } else {
       createMutation.mutate(formData);
     }
