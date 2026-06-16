@@ -5,6 +5,7 @@ import { formatDate } from "@/utils/dateFormatter";
 import formatNumber from "@/utils/formatNumber";
 import { formatPhoneNumber } from "@/utils/phoneNumberFormatter";
 import { getImageUrl } from "@/utils/imageUtils";
+import { showToast } from "@/utils/toastHelper";
 import { Link } from "react-router-dom";
 import {
   ORDER_STATUS_OPTIONS,
@@ -251,9 +252,30 @@ export const promocodeColumns: Column[] = [
     header: "Промокод",
     filter: "input",
     filterKey: "search",
-    render: (value) => (
-      <span className="font-semibold text-gray-900">{value || "-"}</span>
-    ),
+    render: (value) => {
+      const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (!value) return;
+
+        try {
+          await navigator.clipboard.writeText(value);
+          showToast.success("Промокод скопирован!");
+        } catch {
+          showToast.error("Не удалось скопировать промокод");
+        }
+      };
+
+      return (
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="font-semibold text-gray-900 hover:text-main-orange transition"
+          title="Скопировать промокод"
+        >
+          {value || "-"}
+        </button>
+      );
+    },
   },
   {
     id: "status",

@@ -26,6 +26,11 @@ const defaultFormData = {
   status: "ACTIVE",
 };
 
+const defaultReportFilters = {
+  date_from: "",
+  date_to: "",
+};
+
 const defaultAgentSettings = {
   client_discount_amount: 0,
   agent_credit_amount: 0,
@@ -71,6 +76,7 @@ function Promocodes() {
   const params = Object.fromEntries(searchParams.entries());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState(defaultFormData);
+  const [reportFilters, setReportFilters] = useState(defaultReportFilters);
   const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
   const isAgent = user?.role === "AGENT";
 
@@ -157,6 +163,38 @@ function Promocodes() {
     createMutation.mutate(payload);
   };
 
+  const getExcelParams = () => {
+    return Object.fromEntries(
+      Object.entries(reportFilters).filter(([, value]) => Boolean(value)),
+    );
+  };
+
+  const handleExcelExport = async () => {
+    try {
+      const { data } = isAdmin
+        ? await referenceAPI.getAdminPromocodeReportExcel(getExcelParams())
+        : await referenceAPI.getMyPromocodeReportExcel(getExcelParams());
+
+      const url = URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `${isAdmin ? "admin" : "agent"}-promocode-report-${new Date()
+          .toISOString()
+          .slice(0, 10)}.xlsx`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      showToast.error(
+        error?.response?.data?.message || "Excel yuklashda xatolik yuz berdi",
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 h-full">
       <div className="flex items-center justify-between gap-4">
@@ -209,6 +247,12 @@ function Promocodes() {
         </UniversalModal>
       )}
 
+      <ReportExcelFilters
+        filters={reportFilters}
+        setFilters={setReportFilters}
+        onExcelExport={handleExcelExport}
+      />
+
       <div className="bg-white rounded shadow-sm border overflow-hidden h-full">
         <CustomTable
           defaultPageSize={meta?.totalSize}
@@ -222,6 +266,69 @@ function Promocodes() {
         />
       </div>
     </div>
+  );
+}
+
+function ReportExcelFilters({
+  filters,
+  setFilters,
+  onExcelExport,
+}: {
+  filters: typeof defaultReportFilters;
+  setFilters: React.Dispatch<React.SetStateAction<typeof defaultReportFilters>>;
+  onExcelExport: () => void;
+}) {
+  const updateFilter = (name: keyof typeof defaultReportFilters, value: string) => {
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  return (
+    <div className="bg-white rounded shadow-sm border p-4">
+      <div className="flex flex-wrap items-end gap-3">
+        <FilterInput
+          label="Дата от"
+          type="date"
+          value={filters.date_from}
+          onChange={(value) => updateFilter("date_from", value)}
+        />
+        <FilterInput
+          label="Дата до"
+          type="date"
+          value={filters.date_to}
+          onChange={(value) => updateFilter("date_to", value)}
+        />
+        <UniversalBtn type="button" className="h-[38px]" onClick={onExcelExport}>
+          Excel
+        </UniversalBtn>
+      </div>
+    </div>
+  );
+}
+
+function FilterInput({
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  placeholder?: string;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-sm text-main-grey">{label}</span>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="border w-[180px] outline-none px-3 border-[rgb(116,120,141,0.35)] py-2 rounded text-sm"
+      />
+    </label>
   );
 }
 
