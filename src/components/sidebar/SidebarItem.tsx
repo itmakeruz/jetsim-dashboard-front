@@ -9,6 +9,7 @@ const SidebarItem = ({ icon: Icon, label, path }) => {
   return (
     <NavLink
       to={path}
+      end={path === "/" || path === "/promocodes"}
       className={({ isActive }) => {
         return `${isActive ? activeStyle : inactiveStyle} ${baseStyle}`;
       }}

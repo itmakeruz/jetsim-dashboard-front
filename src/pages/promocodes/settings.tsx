@@ -92,10 +92,12 @@ function PromocodeSettings() {
     e.preventDefault();
 
     updateMutation.mutate({
-      default_client_discount_amount: Number(
-        formData.default_client_discount_amount,
-      ),
-      default_agent_credit_amount: Number(formData.default_agent_credit_amount),
+      default_client_discount_amount: formData.default_client_discount_amount
+        ? Number(formData.default_client_discount_amount)
+        : null,
+      default_agent_credit_amount: formData.default_agent_credit_amount
+        ? Number(formData.default_agent_credit_amount)
+        : null,
       is_agent_creation_enabled: formData.is_agent_creation_enabled,
       agent_creation_mode: formData.agent_creation_mode,
       allow_limit_once: formData.allow_limit_once,

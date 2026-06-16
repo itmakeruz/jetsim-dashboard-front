@@ -18,10 +18,50 @@ import { useAuthStore } from "@/store/authStore";
 const defaultFormData = {
   creation_mode: "AUTO",
   code: "",
-  limit_type: "unlimited",
+  limit_type: "UNLIMITED",
   usage_limit: "",
   expiry_type: "none",
   expires_at: "",
+  agent_id: "",
+  status: "ACTIVE",
+};
+
+const defaultAgentSettings = {
+  client_discount_amount: 0,
+  agent_credit_amount: 0,
+  is_creation_enabled: true,
+  creation_mode: "BOTH",
+  allow_limit_once: true,
+  allow_limit_unlimited: true,
+  allow_limit_custom: true,
+  allow_no_expiry: true,
+  allow_expires_at: true,
+};
+
+const getInitialFormData = (
+  isAdmin: boolean,
+  agentSettings: typeof defaultAgentSettings,
+) => {
+  const creationMode =
+    !isAdmin && agentSettings.creation_mode === "MANUAL" ? "MANUAL" : "AUTO";
+
+  const limitType = agentSettings.allow_limit_unlimited
+    ? "UNLIMITED"
+    : agentSettings.allow_limit_once
+      ? "ONCE"
+      : "CUSTOM";
+
+  const expiryType =
+    !isAdmin && !agentSettings.allow_no_expiry && agentSettings.allow_expires_at
+      ? "date"
+      : "none";
+
+  return {
+    ...defaultFormData,
+    creation_mode: creationMode,
+    limit_type: isAdmin ? defaultFormData.limit_type : limitType,
+    expiry_type: expiryType,
+  };
 };
 
 function Promocodes() {
@@ -31,54 +71,87 @@ function Promocodes() {
   const params = Object.fromEntries(searchParams.entries());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState(defaultFormData);
+  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+  const isAgent = user?.role === "AGENT";
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ["my-promocodes", params],
-    queryFn: () => referenceAPI.getMyPromocodes({ page: 1, size, ...params }),
+    queryKey: ["promocodes", user?.role, params],
+    queryFn: () =>
+      isAdmin
+        ? referenceAPI.getAdminPromocodes({ page: 1, size, ...params })
+        : referenceAPI.getMyPromocodes({ page: 1, size, ...params }),
+    enabled: Boolean(user?.role),
+    staleTime: 30000,
+  });
+
+  const { data: agentSettingsResponse } = useQuery({
+    queryKey: ["my-promocode-settings"],
+    queryFn: () => referenceAPI.getMyPromocodeSettings(),
+    enabled: isAgent,
     staleTime: 30000,
   });
 
   const balance = response?.data?.data?.balance ?? 0;
-  const promocodes = response?.data?.data?.items ?? [];
+  const promocodes = isAdmin
+    ? response?.data?.data?.items || response?.data?.data || []
+    : (response?.data?.data?.items ?? []);
   const meta = response?.data?.meta;
-  const canCreatePromocode = user?.role === "AGENT";
+  const agentSettings =
+    agentSettingsResponse?.data?.data ?? defaultAgentSettings;
+  const canCreatePromocode =
+    isAdmin || (isAgent && agentSettings.is_creation_enabled);
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => referenceAPI.createMyPromocode(data),
+    mutationFn: (data: any) =>
+      isAdmin
+        ? referenceAPI.createAdminPromocode(data)
+        : referenceAPI.createMyPromocode(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-promocodes"] });
+      queryClient.invalidateQueries({ queryKey: ["promocodes"] });
       showToast.success("Промокод успешно создан!");
       closeCreateModal();
     },
-    onError: () => {
-      showToast.error("Произошла ошибка при создании промокода");
+    onError: (error: any) => {
+      showToast.error(
+        error?.response?.data?.message ||
+          "Произошла ошибка при создании промокода",
+      );
     },
   });
 
   const closeCreateModal = () => {
     setIsCreateModalOpen(false);
-    setFormData(defaultFormData);
+    setFormData(getInitialFormData(isAdmin, agentSettings));
   };
 
   const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const payload: any = {
-      creation_mode: formData.creation_mode,
-      usage_limit:
-        formData.limit_type === "once"
-          ? 1
-          : formData.limit_type === "custom"
-            ? Number(formData.usage_limit)
-            : null,
-      expires_at:
-        formData.expiry_type === "date"
-          ? new Date(formData.expires_at).toISOString()
-          : null,
+      limit_type: formData.limit_type,
     };
+
+    if (!isAdmin) {
+      payload.creation_mode = formData.creation_mode;
+    }
 
     if (formData.creation_mode === "MANUAL") {
       payload.code = formData.code.trim().toUpperCase();
+    }
+
+    if (formData.limit_type === "CUSTOM") {
+      payload.usage_limit = Number(formData.usage_limit);
+    }
+
+    if (formData.expiry_type === "date") {
+      payload.expires_at = new Date(formData.expires_at).toISOString();
+    }
+
+    if (isAdmin) {
+      payload.status = formData.status;
+      if (formData.agent_id) {
+        payload.agent_id = Number(formData.agent_id);
+      }
     }
 
     createMutation.mutate(payload);
@@ -89,24 +162,33 @@ function Promocodes() {
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold text-main-black">Промокоды</h1>
 
-        <div className="flex items-center gap-3">
-          <div className="bg-white flex items-center gap-3 border border-gray-100 rounded px-4 py-2 shadow-sm">
-            <p className="text-xs text-gray-500">Баланс</p>
-            <p className="text-lg font-semibold text-gray-900">
-              {formatNumber(balance)} ₽
-            </p>
-          </div>
+        {isAgent && (
+          <div className="flex items-center gap-3">
+            <div className="bg-white flex items-center gap-3 border border-gray-100 rounded px-4 py-2 shadow-sm">
+              <p className="text-xs text-gray-500">Баланс</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {formatNumber(balance)} ₽
+              </p>
+            </div>
 
-          {canCreatePromocode && (
-            <UniversalBtn
-              className="text-sm"
-              icon={Plus}
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              Создать промокод
-            </UniversalBtn>
-          )}
-        </div>
+            {canCreatePromocode ? (
+              <UniversalBtn
+                className="text-sm"
+                icon={Plus}
+                onClick={() => {
+                  setFormData(getInitialFormData(isAdmin, agentSettings));
+                  setIsCreateModalOpen(true);
+                }}
+              >
+                Создать промокод
+              </UniversalBtn>
+            ) : (
+              <UniversalBtn className="text-sm opacity-60" disabled>
+                Создание запрещено
+              </UniversalBtn>
+            )}
+          </div>
+        )}
       </div>
 
       {isCreateModalOpen && (
@@ -118,7 +200,12 @@ function Promocodes() {
           onSubmit={handleCreateSubmit}
           loading={createMutation.isPending}
         >
-          <CreatePromocodeForm formData={formData} setFormData={setFormData} />
+          <CreatePromocodeForm
+            formData={formData}
+            setFormData={setFormData}
+            isAdmin={isAdmin}
+            agentSettings={agentSettings}
+          />
         </UniversalModal>
       )}
 
@@ -141,18 +228,32 @@ function Promocodes() {
 function CreatePromocodeForm({
   formData,
   setFormData,
+  isAdmin,
+  agentSettings,
 }: {
   formData: typeof defaultFormData;
   setFormData: React.Dispatch<React.SetStateAction<typeof defaultFormData>>;
+  isAdmin: boolean;
+  agentSettings: typeof defaultAgentSettings;
 }) {
   const isManualMode = formData.creation_mode === "MANUAL";
-  const isCustomLimit = formData.limit_type === "custom";
+  const isCustomLimit = formData.limit_type === "CUSTOM";
   const hasExpiryDate = formData.expiry_type === "date";
+  const autoDisabled = !isAdmin && agentSettings.creation_mode === "MANUAL";
+  const manualDisabled = !isAdmin && agentSettings.creation_mode === "AUTO";
+  const onceDisabled = !isAdmin && !agentSettings.allow_limit_once;
+  const unlimitedDisabled = !isAdmin && !agentSettings.allow_limit_unlimited;
+  const customDisabled = !isAdmin && !agentSettings.allow_limit_custom;
+  const noExpiryDisabled = !isAdmin && !agentSettings.allow_no_expiry;
+  const expiresAtDisabled = !isAdmin && !agentSettings.allow_expires_at;
 
   const handleCodeChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      code: value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 32),
+      code: value
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "")
+        .slice(0, 32),
     }));
   };
 
@@ -172,6 +273,7 @@ function CreatePromocodeForm({
             name="creation_mode"
             label="Сгенерировать автоматически"
             checked={formData.creation_mode === "AUTO"}
+            disabled={autoDisabled}
             onChange={() =>
               setFormData((prev) => ({ ...prev, creation_mode: "AUTO" }))
             }
@@ -180,6 +282,7 @@ function CreatePromocodeForm({
             name="creation_mode"
             label="Ввести вручную"
             checked={formData.creation_mode === "MANUAL"}
+            disabled={manualDisabled}
             onChange={() =>
               setFormData((prev) => ({ ...prev, creation_mode: "MANUAL" }))
             }
@@ -210,25 +313,28 @@ function CreatePromocodeForm({
           <RadioOption
             name="limit_type"
             label="Одноразовый (1)"
-            checked={formData.limit_type === "once"}
+            checked={formData.limit_type === "ONCE"}
+            disabled={onceDisabled}
             onChange={() =>
-              setFormData((prev) => ({ ...prev, limit_type: "once" }))
+              setFormData((prev) => ({ ...prev, limit_type: "ONCE" }))
             }
           />
           <RadioOption
             name="limit_type"
             label="Безлимитный"
-            checked={formData.limit_type === "unlimited"}
+            checked={formData.limit_type === "UNLIMITED"}
+            disabled={unlimitedDisabled}
             onChange={() =>
-              setFormData((prev) => ({ ...prev, limit_type: "unlimited" }))
+              setFormData((prev) => ({ ...prev, limit_type: "UNLIMITED" }))
             }
           />
           <RadioOption
             name="limit_type"
             label="Указать число"
-            checked={formData.limit_type === "custom"}
+            checked={formData.limit_type === "CUSTOM"}
+            disabled={customDisabled}
             onChange={() =>
-              setFormData((prev) => ({ ...prev, limit_type: "custom" }))
+              setFormData((prev) => ({ ...prev, limit_type: "CUSTOM" }))
             }
           />
         </div>
@@ -250,6 +356,7 @@ function CreatePromocodeForm({
           type="checkbox"
           label="Без срока действия"
           checked={formData.expiry_type === "none"}
+          disabled={noExpiryDisabled}
           onChange={() =>
             setFormData((prev) => ({
               ...prev,
@@ -271,11 +378,53 @@ function CreatePromocodeForm({
                 }))
               }
               required={hasExpiryDate}
+              disabled={expiresAtDisabled}
               className="max-w-[220px]"
             />
           </div>
         )}
       </div>
+
+      {isAdmin && (
+        <>
+          <div className="flex flex-col gap-2">
+            <CustomLabel labelText="ID агента" />
+            <CustomInput
+              value={formData.agent_id}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  agent_id: e.target.value.replace(/[^\d]/g, ""),
+                }))
+              }
+              placeholder="Необязательно"
+              className="max-w-[180px]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <CustomLabel labelText="Статус" />
+            <div className="flex flex-wrap gap-6">
+              <RadioOption
+                name="status"
+                label="Активный"
+                checked={formData.status === "ACTIVE"}
+                onChange={() =>
+                  setFormData((prev) => ({ ...prev, status: "ACTIVE" }))
+                }
+              />
+              <RadioOption
+                name="status"
+                label="Неактивный"
+                checked={formData.status === "INACTIVE"}
+                onChange={() =>
+                  setFormData((prev) => ({ ...prev, status: "INACTIVE" }))
+                }
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -286,20 +435,27 @@ function RadioOption({
   checked,
   onChange,
   type = "radio",
+  disabled = false,
 }: {
   name: string;
   label: string;
   checked: boolean;
   onChange: () => void;
   type?: "radio" | "checkbox";
+  disabled?: boolean;
 }) {
   return (
-    <label className="flex items-center gap-2 cursor-pointer text-main-black">
+    <label
+      className={`flex items-center gap-2 text-main-black ${
+        disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+      }`}
+    >
       <input
         type={type}
         name={name}
         checked={checked}
         onChange={onChange}
+        disabled={disabled}
         className="accent-[#112d6c] w-5 h-5"
       />
       {label}

@@ -187,7 +187,25 @@ export const referenceAPI = {
   // Promocodes
   getMyPromocodes: (params?: GetParams) =>
     axios.get("/promocode/my", { params }),
+  getMyPromocodeSettings: () => axios.get("/promocode/my/settings"),
   createMyPromocode: (data) => axios.post("/promocode/my", data),
+  getMyPromocodeStatistics: (params?: GetParams) =>
+    axios.get("/promocode/my/statistics", { params }),
+  getMyPromocodeReportExcel: (params?: GetParams) =>
+    axios.get("/promocode/my/report/excel", { params, responseType: "blob" }),
+  getAdminPromocodes: (params?: GetParams) =>
+    axios.get("/promocode/admin", { params }),
+  createAdminPromocode: (data) => axios.post("/promocode/admin", data),
+  updateAdminPromocode: (id, data) => axios.patch(`/promocode/admin/${id}`, data),
+  changeAdminPromocodeStatus: (id, data) =>
+    axios.patch(`/promocode/admin/${id}/status`, data),
+  getAdminPromocodeStatistics: (params?: GetParams) =>
+    axios.get("/promocode/admin/statistics", { params }),
+  getAdminPromocodeReportExcel: (params?: GetParams) =>
+    axios.get("/promocode/admin/report/excel", {
+      params,
+      responseType: "blob",
+    }),
   getPromocodeSettings: () => axios.get("/promocode/settings"),
   updatePromocodeSettings: (data) => axios.patch("/promocode/settings", data),
 };
