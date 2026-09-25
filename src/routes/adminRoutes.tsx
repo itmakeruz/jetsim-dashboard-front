@@ -1,4 +1,5 @@
 import Dashboard from "../pages/dashboard";
+import Reports from "../pages/reports";
 
 // Справочные таблицы
 import ReferenceLayout from "./../pages/reference/index";
@@ -34,6 +35,7 @@ import Categories from "../pages/support/categories";
 
 const adminRoutes = [
   { path: "/", element: <Dashboard /> },
+  { path: "/reports", element: <Reports /> },
 
   { path: "/users", element: <Users /> },
   { path: "/users/view/:id", element: <UserSingle /> },

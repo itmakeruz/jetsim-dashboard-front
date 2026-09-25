@@ -2,8 +2,8 @@ const FULL_ACCESS_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
 const ROLE_ALLOWED_PATHS = {
   AGENT: ["/promocodes"],
-  ACCOUNTANT: ["/"],
-  PRE_ACCOUNTANT: ["/"],
+  ACCOUNTANT: ["/", "/reports"],
+  PRE_ACCOUNTANT: ["/", "/reports"],
 };
 
 const getUserRole = (user) => user?.role || "";

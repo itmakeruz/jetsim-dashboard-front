@@ -168,7 +168,7 @@ function TableHead({ columns, hasActions = false }: TableHeadProps) {
         value={value}
         style={{ width: column.width }}
         onChange={(e) => updateFilter(key, e.target.value)}
-        placeholder={`${column.header}...`}
+        placeholder={column.filterPlaceholder ?? `${column.header}...`}
         className="min-w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     );

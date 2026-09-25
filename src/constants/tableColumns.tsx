@@ -1,4 +1,6 @@
 import StatusBadge from "@/components/status/StatusBadge";
+import CopyButton from "@/components/CopyButton";
+import SimsCellPreview from "@/components/tables/SimsCellPreview";
 import { Column } from "@/components/tables/tableType";
 import { Transaction } from "@/types/transactions";
 import { formatDate } from "@/utils/dateFormatter";
@@ -14,6 +16,8 @@ import {
   TRANSACTION_STATUS_OPTIONS,
   VERIFICATION_STATUS_OPTIONS,
   VERIFICATION_STATUS_CLASSES,
+  SIM_ACTIVATION_OPTIONS,
+  SIM_ACTIVATION_CLASSES,
 } from "./statusOptions";
 
 // Helper functions for user avatar
@@ -39,12 +43,15 @@ export const userColumns: Column[] = [
   {
     id: "id",
     header: "ID",
-    filter: "input",
     width: 60,
   },
   {
     id: "name",
     header: "Имя",
+    // Единый поиск по ID, имени, email и телефону — бэкенд принимает его как ?search=
+    filter: "input",
+    filterKey: "search",
+    filterPlaceholder: "Поиск: ID, имя, email, телефон",
     render: (value, row) => (
       <div className="flex items-center gap-2">
         {row?.image ? (
@@ -72,7 +79,6 @@ export const userColumns: Column[] = [
         </span>
       </div>
     ),
-    filter: "input",
   },
   {
     id: "email",
@@ -82,7 +88,6 @@ export const userColumns: Column[] = [
         {value}
       </Link>
     ),
-    filter: "input",
   },
   {
     id: "phone_number",
@@ -92,7 +97,6 @@ export const userColumns: Column[] = [
         {formatPhoneNumber(value) || "—"}
       </Link>
     ),
-    filter: "input",
   },
   {
     id: "is_verified",
@@ -104,19 +108,11 @@ export const userColumns: Column[] = [
         classes={VERIFICATION_STATUS_CLASSES}
       />
     ),
-    filter: {
-      type: "select",
-      options: [
-        { value: "true", label: "Да" },
-        { value: "false", label: "Нет" },
-      ],
-    },
   },
   {
     id: "created_at",
     header: "Дата",
     render: (value) => (value ? formatDate(value, "ru") : "-"),
-    filter: "date",
   },
 ];
 
@@ -128,8 +124,45 @@ export const orderColumns: Column[] = [
     render: (value) => (
       <span className="font-semibold text-gray-900">{value}</span>
     ),
+    // Единый поиск по ID заказа, ICCID и данным клиента
     filter: "input",
+    filterKey: "search",
+    filterPlaceholder: "Поиск: ID, ICCID, email, имя",
     width: 60,
+  },
+  {
+    id: "user",
+    header: "Email клиента",
+    render: (value) =>
+      value?.email ? (
+        <div className="flex items-center gap-1">
+          <Link
+            to={`mailto:${value.email}`}
+            onClick={(e) => e.stopPropagation()}
+            className="text-blue-600 font-medium"
+          >
+            {value.email}
+          </Link>
+          <CopyButton value={value.email} label="email" />
+        </div>
+      ) : (
+        "—"
+      ),
+  },
+  {
+    id: "sims",
+    header: "ICCID",
+    render: (value) => <SimsCellPreview sims={value} field="iccid" copyLabel="ICCID" mono />,
+  },
+  {
+    id: "sims",
+    header: "Тариф",
+    render: (value) => <SimsCellPreview sims={value} field="tariff_name" />,
+  },
+  {
+    id: "sims",
+    header: "ГБ",
+    render: (value) => <SimsCellPreview sims={value} field="internet" />,
   },
   {
     id: "status",
@@ -141,12 +174,12 @@ export const orderColumns: Column[] = [
         classes={ORDER_STATUS_CLASSES}
       />
     ),
-    filter: { type: "select", options: TRANSACTION_STATUS_OPTIONS },
+    filter: { type: "select", options: ORDER_STATUS_OPTIONS },
   },
   {
     id: "created_at",
-    header: "Sana oraligʻi",
-    filter: { type: "dateRange", startKey: "startDate", endKey: "endDate" },
+    header: "Период",
+    filter: { type: "dateRange", startKey: "date_from", endKey: "date_to" },
     render: (value) =>
       value ? (
         <div className="text-center">{formatDate(value, "ru")}</div>
@@ -178,6 +211,63 @@ export const orderColumns: Column[] = [
         </span>
       );
     },
+  },
+];
+
+// Отчёт по продажам: тариф · объём · кем · сумма · дата · статус
+export const reportColumns: Column[] = [
+  {
+    id: "created_at",
+    header: "Дата",
+    filter: { type: "dateRange", startKey: "date_from", endKey: "date_to" },
+    render: (value) => (value ? formatDate(value, "ru") : "—"),
+  },
+  {
+    id: "tariff_name",
+    header: "Тариф",
+    filter: "input",
+    filterKey: "search",
+    filterPlaceholder: "Поиск: тариф, имя, email",
+    render: (value) => (
+      <span className="font-medium text-gray-900">{value || "—"}</span>
+    ),
+  },
+  {
+    id: "quantity_internet",
+    header: "Объём",
+    render: (value) => <span>{value ?? 0} GB</span>,
+  },
+  {
+    id: "buyer_name",
+    header: "Кем куплено",
+    render: (_value, row) => (
+      <div className="flex flex-col">
+        <span className="text-gray-900">{row?.buyer_name || "—"}</span>
+        {row?.buyer_email && (
+          <span className="text-xs text-gray-500">{row.buyer_email}</span>
+        )}
+      </div>
+    ),
+  },
+  {
+    id: "amount",
+    header: "Сумма",
+    render: (value) => (
+      <span className="font-semibold text-green-700">
+        {formatNumber(value || 0)} ₽
+      </span>
+    ),
+  },
+  {
+    id: "sim_status",
+    header: "Статус",
+    render: (value) => (
+      <StatusBadge
+        options={SIM_ACTIVATION_OPTIONS}
+        status={value ?? "NOT_ACTIVATED"}
+        classes={SIM_ACTIVATION_CLASSES}
+      />
+    ),
   },
 ];
 

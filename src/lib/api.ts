@@ -11,6 +11,12 @@ const getList = <T>(url: string, params: GetParams = {}) => {
   return axios.get<T>(url, { params: finalParams }).then((res) => res.data);
 };
 const get = <T>(url: string) => axios.get<T>(url).then((res) => res.data);
+export const reportsAPI = {
+  getSales: (params?: GetParams) => getList<any>("/reports/sales", params),
+  getSalesExcel: (params?: GetParams) =>
+    axios.get("/reports/sales/excel", { params, responseType: "blob" }),
+};
+
 // Auth API - Exact match from api-data.json
 export const authAPI = {
   login: (data) => axios.post("/auth/login", data),
@@ -61,6 +67,11 @@ export const siteAPI = {
 export const ordersAPI = {
   // Admin Orders
   getOrders: (params) => axios.get("/order/admin", { params }),
+
+  // QR-код eSIM: эндпоинт закрыт гардом, поэтому тянем блобом через axios,
+  // а не подставляем в <img src> напрямую
+  getSimQrCode: (simId: number | string) =>
+    axios.get(`/sims/${simId}/qr`, { responseType: "blob" }),
 
   // Product Orders
   getProductOrders: (params) => axios.get("/product-orders", { params }),

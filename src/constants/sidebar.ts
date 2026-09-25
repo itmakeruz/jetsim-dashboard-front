@@ -14,11 +14,17 @@ import {
   IdCardIcon,
   Settings,
   TicketPercent,
+  FileBarChart2,
 } from "lucide-react";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 
 const adminMenu = [
   { path: "/", label: "Главная", icon: House },
+  {
+    path: "/reports",
+    label: "Отчеты",
+    icon: FileBarChart2,
+  },
   {
     path: "/users",
     label: "Пользователи",

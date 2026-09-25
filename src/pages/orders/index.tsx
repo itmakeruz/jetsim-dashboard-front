@@ -9,7 +9,15 @@ import { formatDate } from "@/utils/dateFormatter";
 
 import CustomTable from "@/components/tables/CustomTable";
 import UniversalModal from "@/components/modals/UniversalModal";
+import StatusBadge from "@/components/status/StatusBadge";
+import SimQrCode from "@/components/SimQrCode";
 import { orderColumns } from "@/constants/tableColumns";
+import {
+  SIM_ACTIVATION_CLASSES,
+  SIM_ACTIVATION_OPTIONS,
+  SIM_ISSUE_CLASSES,
+  SIM_ISSUE_OPTIONS,
+} from "@/constants/statusOptions";
 import { size } from "@/constants/paginationStuffs";
 
 interface Tariff {
@@ -28,14 +36,25 @@ interface Sim {
   iccid: string;
   pin_1: string;
   puk_1: string | null;
-  qrcode: string | null;
+  status: string | null;
+  sim_status: string | null;
+  qr_code: string | null;
+  activation_code: string | null;
   tariff: Tariff;
   created_at: string;
   day_left: number;
 }
 
+interface OrderUser {
+  id: number;
+  name: string | null;
+  email: string | null;
+  phone_number: string | null;
+}
+
 interface Order {
   id: number;
+  user: OrderUser | null;
   sims: Sim[];
   created_at: string;
 }
@@ -100,11 +119,23 @@ function Orders() {
                 >
                   {/* SIM Card Header */}
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-gray-700 bg-white px-3 py-1 rounded-lg">
                           SIM {simIndex + 1}
                         </span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <StatusBadge
+                          options={SIM_ACTIVATION_OPTIONS}
+                          status={sim.sim_status ?? "NOT_ACTIVATED"}
+                          classes={SIM_ACTIVATION_CLASSES}
+                        />
+                        <StatusBadge
+                          options={SIM_ISSUE_OPTIONS}
+                          status={sim.status}
+                          classes={SIM_ISSUE_CLASSES}
+                        />
                       </div>
                     </div>
                   </div>
@@ -266,6 +297,13 @@ function Orders() {
                         </div>
                       </div>
                     </div>
+
+                    {sim.qr_code && (
+                      <SimQrCode
+                        simId={sim.id}
+                        activationCode={sim.activation_code}
+                      />
+                    )}
                   </div>
                 </div>
               ))

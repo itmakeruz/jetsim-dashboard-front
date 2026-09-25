@@ -13,6 +13,8 @@ export type Column<T = any> = {
   render?: (value: any, row: T) => React.ReactNode;
   filter?: FilterType;
   filterKey?: string;
+  /** Подпись в поле фильтра; по умолчанию — заголовок колонки */
+  filterPlaceholder?: string;
   width?: number;
 };
 
