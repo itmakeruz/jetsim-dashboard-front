@@ -235,17 +235,26 @@ export const orderColumns: Column[] = [
 // Отчёт по продажам: тариф · объём · кем · сумма · дата · статус
 export const reportColumns: Column[] = [
   {
-    id: "created_at",
-    header: "Дата",
-    filter: { type: "dateRange", startKey: "date_from", endKey: "date_to" },
-    render: (value) => (value ? formatDate(value, "ru") : "—"),
+    id: "iccid",
+    header: "ICCID",
+    filter: "input",
+    filterPlaceholder: "ICCID…",
+    render: (value) =>
+      value ? (
+        <div className="flex items-center gap-1">
+          <span className="font-mono text-sm text-gray-900">{value}</span>
+          <CopyButton value={value} label="ICCID" />
+        </div>
+      ) : (
+        <span className="text-gray-400">—</span>
+      ),
   },
   {
     id: "tariff_name",
     header: "Тариф",
     filter: "input",
-    filterKey: "search",
-    filterPlaceholder: "Поиск: тариф, имя, email",
+    filterKey: "tariff",
+    filterPlaceholder: "Тариф…",
     render: (value) => (
       <span className="font-medium text-gray-900">{value || "—"}</span>
     ),
@@ -253,11 +262,17 @@ export const reportColumns: Column[] = [
   {
     id: "quantity_internet",
     header: "Объём",
+    filter: "input",
+    filterKey: "internet",
+    filterPlaceholder: "ГБ…",
     render: (value) => <span>{value ?? 0} GB</span>,
   },
   {
     id: "buyer_name",
     header: "Кем куплено",
+    filter: "input",
+    filterKey: "buyer",
+    filterPlaceholder: "Имя или email…",
     render: (_value, row) => (
       <div className="flex flex-col">
         <span className="text-gray-900">{row?.buyer_name || "—"}</span>
@@ -270,6 +285,9 @@ export const reportColumns: Column[] = [
   {
     id: "amount",
     header: "Сумма",
+    // Здесь сумма берётся из tariff.price_sell — это целое число,
+    // поэтому диапазон считается корректно (в отличие от заказов)
+    filter: { type: "numberRange", minKey: "amount_from", maxKey: "amount_to" },
     render: (value) => (
       <span className="font-semibold text-green-700">
         {formatNumber(value || 0)} ₽
@@ -279,6 +297,13 @@ export const reportColumns: Column[] = [
   {
     id: "sim_status",
     header: "Статус",
+    filter: {
+      type: "select",
+      options: [
+        { value: "ACTIVATED", label: "Активирована" },
+        { value: "EXPIRED", label: "Использована" },
+      ],
+    },
     render: (value) => (
       <StatusBadge
         options={SIM_ACTIVATION_OPTIONS}
@@ -286,6 +311,12 @@ export const reportColumns: Column[] = [
         classes={SIM_ACTIVATION_CLASSES}
       />
     ),
+  },
+  {
+    id: "created_at",
+    header: "Дата",
+    filter: { type: "dateRange", startKey: "date_from", endKey: "date_to" },
+    render: (value) => (value ? formatDate(value, "ru") : "—"),
   },
 ];
 

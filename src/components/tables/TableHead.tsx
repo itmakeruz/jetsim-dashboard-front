@@ -20,6 +20,14 @@ function TableHead({ columns, hasActions = false }: TableHeadProps) {
           const endVal = searchParams.get(col.filter.endKey);
           if (startVal) filters[col.filter.startKey] = startVal;
           if (endVal) filters[col.filter.endKey] = endVal;
+        } else if (
+          typeof col.filter === "object" &&
+          col.filter.type === "numberRange"
+        ) {
+          const minVal = searchParams.get(col.filter.minKey);
+          const maxVal = searchParams.get(col.filter.maxKey);
+          if (minVal) filters[col.filter.minKey] = minVal;
+          if (maxVal) filters[col.filter.maxKey] = maxVal;
         } else {
           const key = col.filterKey || col.id;
           const value = searchParams.get(key);
@@ -109,6 +117,41 @@ function TableHead({ columns, hasActions = false }: TableHeadProps) {
               title="Tugash sanasi"
             />
           </div>
+        </div>
+      );
+    }
+
+    if (
+      typeof column.filter === "object" &&
+      column.filter.type === "numberRange"
+    ) {
+      const minKey = column.filter.minKey;
+      const maxKey = column.filter.maxKey;
+
+      return (
+        <div className="flex items-center gap-1.5">
+          <input
+            type="number"
+            inputMode="numeric"
+            value={localFilters[minKey] || ""}
+            onChange={(e) => {
+              updateFilter(minKey, e.target.value);
+              applyFilters(minKey, e.target.value);
+            }}
+            placeholder="от"
+            className="w-full min-w-[70px] px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <input
+            type="number"
+            inputMode="numeric"
+            value={localFilters[maxKey] || ""}
+            onChange={(e) => {
+              updateFilter(maxKey, e.target.value);
+              applyFilters(maxKey, e.target.value);
+            }}
+            placeholder="до"
+            className="w-full min-w-[70px] px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
       );
     }

@@ -5,7 +5,8 @@ export type FilterType =
   | "select"
   | "date"
   | { type: "select"; options: { value: string; label: string }[] }
-  | { type: "dateRange"; startKey: string; endKey: string };
+  | { type: "dateRange"; startKey: string; endKey: string }
+  | { type: "numberRange"; minKey: string; maxKey: string };
 
 export type Column<T = any> = {
   id: string;
