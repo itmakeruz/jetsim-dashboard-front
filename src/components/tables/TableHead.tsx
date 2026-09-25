@@ -166,10 +166,11 @@ function TableHead({ columns, hasActions = false }: TableHeadProps) {
       <input
         type="text"
         value={value}
-        style={{ width: column.width }}
         onChange={(e) => updateFilter(key, e.target.value)}
         placeholder={column.filterPlaceholder ?? `${column.header}...`}
-        className="min-w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+        // Ширину колонки на поле ввода не переносим: у колонок вроде ID она 40px,
+        // и поле сжималось до нечитаемого «Поиск: IC…»
+        className="w-full min-w-[140px] px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
     );
   };

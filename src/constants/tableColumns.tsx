@@ -43,15 +43,15 @@ export const userColumns: Column[] = [
   {
     id: "id",
     header: "ID",
+    filter: "input",
+    filterPlaceholder: "ID…",
     width: 60,
   },
   {
     id: "name",
     header: "Имя",
-    // Единый поиск по ID, имени, email и телефону — бэкенд принимает его как ?search=
     filter: "input",
-    filterKey: "search",
-    filterPlaceholder: "Поиск: ID, имя, email, телефон",
+    filterPlaceholder: "Имя…",
     render: (value, row) => (
       <div className="flex items-center gap-2">
         {row?.image ? (
@@ -83,6 +83,8 @@ export const userColumns: Column[] = [
   {
     id: "email",
     header: "Email",
+    filter: "input",
+    filterPlaceholder: "Email…",
     render: (value) => (
       <Link to={`mailto:${value}`} className="text-blue-600 font-medium">
         {value}
@@ -92,6 +94,8 @@ export const userColumns: Column[] = [
   {
     id: "phone_number",
     header: "Телефон",
+    filter: "input",
+    filterPlaceholder: "Телефон…",
     render: (value) => (
       <Link to={`tel:${value}`} className="text-gray-600">
         {formatPhoneNumber(value) || "—"}
@@ -108,10 +112,18 @@ export const userColumns: Column[] = [
         classes={VERIFICATION_STATUS_CLASSES}
       />
     ),
+    filter: {
+      type: "select",
+      options: [
+        { value: "true", label: "Да" },
+        { value: "false", label: "Нет" },
+      ],
+    },
   },
   {
     id: "created_at",
     header: "Дата",
+    filter: { type: "dateRange", startKey: "date_from", endKey: "date_to" },
     render: (value) => (value ? formatDate(value, "ru") : "-"),
   },
 ];
@@ -124,15 +136,18 @@ export const orderColumns: Column[] = [
     render: (value) => (
       <span className="font-semibold text-gray-900">{value}</span>
     ),
-    // Единый поиск по ID заказа, ICCID и данным клиента
+    // Широкий поиск оставляем здесь: по имени клиента отдельной колонки нет
     filter: "input",
     filterKey: "search",
-    filterPlaceholder: "Поиск: ID, ICCID, email, имя",
+    filterPlaceholder: "Поиск: ID, имя, email, ICCID",
     width: 60,
   },
   {
     id: "user",
     header: "Email клиента",
+    filter: "input",
+    filterKey: "email",
+    filterPlaceholder: "Email…",
     render: (value) =>
       value?.email ? (
         <div className="flex items-center gap-1">
@@ -152,6 +167,9 @@ export const orderColumns: Column[] = [
   {
     id: "sims",
     header: "ICCID",
+    filter: "input",
+    filterKey: "iccid",
+    filterPlaceholder: "ICCID…",
     render: (value) => <SimsCellPreview sims={value} field="iccid" copyLabel="ICCID" mono />,
   },
   {
