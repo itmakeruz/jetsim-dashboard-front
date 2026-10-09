@@ -10,6 +10,7 @@ import { formatDate } from "@/utils/dateFormatter";
 import CustomTable from "@/components/tables/CustomTable";
 import UniversalModal from "@/components/modals/UniversalModal";
 import StatusBadge from "@/components/status/StatusBadge";
+import CopyButton from "@/components/CopyButton";
 import SimQrCode from "@/components/SimQrCode";
 import { orderColumns } from "@/constants/tableColumns";
 import {
@@ -36,6 +37,9 @@ interface Sim {
   iccid: string;
   pin_1: string;
   puk_1: string | null;
+  sn_pin: string | null;
+  sn_puk: string | null;
+  sn_code: string | null;
   status: string | null;
   sim_status: string | null;
   qr_code: string | null;
@@ -188,6 +192,47 @@ function Orders() {
                             <p className="text-sm font-mono font-semibold text-gray-900">
                               {sim.puk_1}
                             </p>
+                          </div>
+                        )}
+                        {/* Серийная пара JoyTel — по ней поддержка проверяет eSIM
+                            в кабинете партнёра. У BillionConnect её нет. */}
+                        {sim.sn_pin && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              SN PIN
+                            </label>
+                            <div className="flex items-center gap-1">
+                              <p className="text-sm font-mono font-semibold text-gray-900 break-all">
+                                {sim.sn_pin}
+                              </p>
+                              <CopyButton value={sim.sn_pin} label="SN PIN" />
+                            </div>
+                          </div>
+                        )}
+                        {sim.sn_puk && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              SN PUK
+                            </label>
+                            <div className="flex items-center gap-1">
+                              <p className="text-sm font-mono font-semibold text-gray-900 break-all">
+                                {sim.sn_puk}
+                              </p>
+                              <CopyButton value={sim.sn_puk} label="SN PUK" />
+                            </div>
+                          </div>
+                        )}
+                        {sim.sn_code && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              SN Code
+                            </label>
+                            <div className="flex items-center gap-1">
+                              <p className="text-sm font-mono text-gray-900 break-all">
+                                {sim.sn_code}
+                              </p>
+                              <CopyButton value={sim.sn_code} label="SN Code" />
+                            </div>
                           </div>
                         )}
                       </div>
