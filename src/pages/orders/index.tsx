@@ -1,4 +1,4 @@
-import { Calendar, Wifi, Phone, MessageSquare } from "lucide-react";
+import { Calendar, Wifi, Phone, MessageSquare, History } from "lucide-react";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import UniversalModal from "@/components/modals/UniversalModal";
 import StatusBadge from "@/components/status/StatusBadge";
 import CopyButton from "@/components/CopyButton";
 import SimQrCode from "@/components/SimQrCode";
+import OrderHistoryModal from "./components/OrderHistoryModal";
 import { orderColumns } from "@/constants/tableColumns";
 import {
   SIM_ACTIVATION_CLASSES,
@@ -69,6 +70,7 @@ function Orders() {
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const { data: response, isLoading } = useQuery({
     queryKey: ["orders", params],
@@ -115,6 +117,16 @@ function Orders() {
           width="min-w-[800px]"
         >
           <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsHistoryOpen(true)}
+                className="flex items-center gap-1.5 text-xs font-medium text-main-blue hover:underline"
+              >
+                <History className="w-3.5 h-3.5" />
+                История выдачи — где застрял заказ
+              </button>
+            </div>
             {selectedOrder.sims.length > 0 ? (
               selectedOrder.sims.map((sim, simIndex) => (
                 <div
@@ -359,6 +371,14 @@ function Orders() {
             )}
           </div>
         </UniversalModal>
+      )}
+
+      {selectedOrder && (
+        <OrderHistoryModal
+          orderId={selectedOrder.id}
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+        />
       )}
     </div>
   );

@@ -68,6 +68,10 @@ export const ordersAPI = {
   // Admin Orders
   getOrders: (params) => axios.get("/order/admin", { params }),
 
+  // Пошаговая история выдачи: что отправили партнёру, что он ответил, где застряло
+  getOrderHistory: (id: number | string) =>
+    axios.get(`/order/admin/${id}/history`),
+
   // QR-код eSIM: эндпоинт закрыт гардом, поэтому тянем блобом через axios,
   // а не подставляем в <img src> напрямую
   getSimQrCode: (simId: number | string) =>
