@@ -28,17 +28,26 @@ export default function UsagePanel({ simId, status, snapshot }: Props) {
   const [data, setData] = useState<UsageSnapshot | null>(snapshot ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<unknown>(null);
   const [resultStatus, setResultStatus] = useState<string | null>(null);
   const ready = status === "COMPLETED";
   const check = async () => {
     setLoading(true);
     setError(false);
+    setDiagnostics(null);
     try {
       const response = await axios.get(`/sims/admin/${simId}/usage`);
       setResultStatus(response.data.status);
+      setDiagnostics(response.data.diagnostics ?? null);
       if (response.data.status === "ok") setData(response.data.data);
     } catch (e: unknown) {
-      const last = (e as { response?: { data?: { last_success?: { data: UsageSnapshot } } } }).response?.data?.last_success;
+      const failure = (e as { response?: { status?: number; data?: { message?: string; diagnostics?: unknown; last_success?: { data: UsageSnapshot } } }; message?: string });
+      const last = failure.response?.data?.last_success;
+      setDiagnostics(failure.response?.data?.diagnostics ?? {
+        http_status: failure.response?.status ?? null,
+        error: failure.response?.data?.message ?? failure.message ?? "Сервер недоступен",
+        note: "Сервер не вернул диагностику поставщика. Проверьте, что backend обновлён и перезапущен.",
+      });
       if (last?.data) setData(last.data);
       setError(true);
     } finally { setLoading(false); }
@@ -66,6 +75,13 @@ export default function UsagePanel({ simId, status, snapshot }: Props) {
       <button type="button" onClick={check} disabled={loading || !ready} className="rounded-lg bg-[#112D6C] px-3 py-2 text-white disabled:opacity-50">
         {loading ? t("checking") : t("check")}
       </button>
+      {diagnostics != null && (
+        <details open={error} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <summary className="cursor-pointer font-medium text-[#112D6C]">Лог проверки баланса</summary>
+          <p className="mt-2 text-xs text-slate-500">Запрос и ответ поставщика. Ключи, пароли и данные авторизации скрыты.</p>
+          <pre tabIndex={0} className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap break-all text-xs leading-5 text-slate-800">{JSON.stringify(diagnostics, null, 2)}</pre>
+        </details>
+      )}
     </section>
   );
 }
