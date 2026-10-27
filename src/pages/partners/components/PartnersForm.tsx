@@ -61,16 +61,13 @@ function PartnersForm({ formData, setFormData, editData }: PartnersFormProps) {
         />
       </div>
       <div>
-        <CustomLabel>Идентификационный номер</CustomLabel>
-        <CustomInput
-          type="number"
+        <CustomLabel>Поставщик</CustomLabel>
+        <CustomSelect
           value={formData.identified_number}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              identified_number: Number(e.target.value),
-            })
-          }
+          options={[{ id: 1, name: "Joytel" }, { id: 2, name: "BillionConnect" }, { id: 3, name: "Mobiline" }]}
+          placeholder="Выберите поставщика"
+          onChange={(e) => setFormData({ ...formData, identified_number: Number(e.target.value) })}
+          name="identified_number"
         />
       </div>
       <div>

@@ -1,3 +1,4 @@
+import UsagePanel, { type UsageSnapshot } from "@/components/UsagePanel";
 import { Calendar, Wifi, Phone, MessageSquare, History } from "lucide-react";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -34,6 +35,7 @@ interface Tariff {
 }
 
 interface Sim {
+  usage_snapshot?: UsageSnapshot | null;
   id: number;
   iccid: string;
   pin_1: string;
@@ -156,6 +158,7 @@ function Orders() {
                     </div>
                   </div>
 
+                  <div className="p-4"><UsagePanel simId={sim.id} status={sim.status} snapshot={sim.usage_snapshot} /></div>
                   {/* SIM Card Content */}
                   <div className="p-4 space-y-4">
                     {/* SIM Info */}

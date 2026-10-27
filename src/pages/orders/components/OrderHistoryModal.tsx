@@ -72,6 +72,17 @@ const EVENT_LABELS: Record<string, string> = {
   order_has_failed_sims: "Часть eSIM не выдана",
 
   // JoyTel
+  mobiline_submit_requested: "Заявка отправлена в Mobiline",
+  mobiline_submit_succeeded: "Mobiline принял заявку — ждём callback",
+  mobiline_submit_failed: "Не удалось выпустить eSIM Mobiline",
+  mobiline_submit_unknown: "Результат заявки неизвестен — нужна проверка",
+  mobiline_application_id_missing: "Mobiline не вернул application_id",
+  mobiline_callback_received: "Mobiline прислал QR — eSIM готова",
+  mobiline_callback_failed: "Mobiline сообщил об отказе",
+  mobiline_callback_invalid: "Mobiline прислал неполные данные eSIM",
+  mobiline_callback_duplicate: "Повторный callback Mobiline пропущен",
+  mobiline_notification_failed: "Не удалось отправить уведомление",
+  mobiline_callback_post_processing_failed: "eSIM готова; ошибка постобработки",
   joytel_submit_requested: "Заявка отправлена в JoyTel",
   joytel_submit_succeeded: "JoyTel принял заказ",
   joytel_submit_failed: "JoyTel отклонил заказ",
