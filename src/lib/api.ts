@@ -68,6 +68,20 @@ export const ordersAPI = {
   // Admin Orders
   getOrders: (params) => axios.get("/order/admin", { params }),
 
+  // Заказ из админки: сотрудник сам принял оплату, eSIM выдаётся как после онлайн-оплаты
+  createAdminOrder: (data: {
+    tariff_id: number;
+    quantity: number;
+    client_email: string;
+    client_name?: string;
+    client_phone?: string;
+    payment_method: "CASH" | "CARD" | "TRANSFER" | "OTHER";
+    comment?: string;
+    request_id: string;
+  }) => axios.post("/order/admin", data),
+  searchTariffsForOrder: (search: string) =>
+    axios.get("/tariff/admin", { params: { search: search || undefined, size: 20 } }),
+
   // Пошаговая история выдачи: что отправили партнёру, что он ответил, где застряло
   getOrderHistory: (id: number | string) =>
     axios.get(`/order/admin/${id}/history`),

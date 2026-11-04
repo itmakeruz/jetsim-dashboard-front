@@ -1,7 +1,7 @@
 import UsagePanel, { type UsageSnapshot } from "@/components/UsagePanel";
-import { Calendar, Wifi, Phone, MessageSquare, History } from "lucide-react";
+import { Calendar, Wifi, Phone, MessageSquare, History, Plus } from "lucide-react";
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { ordersAPI } from "@/lib/api";
@@ -14,6 +14,8 @@ import StatusBadge from "@/components/status/StatusBadge";
 import CopyButton from "@/components/CopyButton";
 import SimQrCode from "@/components/SimQrCode";
 import OrderHistoryModal from "./components/OrderHistoryModal";
+import UniversalBtn from "@/components/buttons/UniversalBtn";
+import { useAuthStore } from "@/store/authStore";
 import { orderColumns } from "@/constants/tableColumns";
 import {
   SIM_ACTIVATION_CLASSES,
@@ -73,6 +75,10 @@ function Orders() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  // Бухгалтер заказы только смотрит; оформлять заказы клиентам могут администраторы
+  const canCreate = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
   const { data: response, isLoading } = useQuery({
     queryKey: ["orders", params],
@@ -86,7 +92,14 @@ function Orders() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col gap-4 h-full">
+      {canCreate && (
+        <div className="flex justify-end">
+          <UniversalBtn className="text-sm" icon={Plus} onClick={() => navigate("/orders/create")}>
+            Создать заказ
+          </UniversalBtn>
+        </div>
+      )}
       <div className="bg-white rounded shadow-sm border overflow-hidden h-full">
         <CustomTable
           columns={orderColumns}

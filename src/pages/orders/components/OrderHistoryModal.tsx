@@ -61,6 +61,8 @@ const PARTNER_NAMES: Record<number, string> = {
 const EVENT_LABELS: Record<string, string> = {
   // Заказ и оплата
   order_created: "Заказ создан",
+  manual_order_created: "Заказ создан сотрудником в админке",
+  payment_manual_confirmed: "Оплата принята сотрудником вручную",
   payment_link_created: "Ссылка на оплату получена от Т-Банка",
   payment_link_failed: "Не удалось получить ссылку на оплату",
   payment_webhook_signature_mismatch: "Подпись вебхука Т-Банка не совпала",

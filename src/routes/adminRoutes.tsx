@@ -10,6 +10,7 @@ import TariffsTypes from "../pages/reference/tariffsTypes";
 
 // Заказы
 import Orders from "../pages/orders/index";
+import CreateOrder from "../pages/orders/CreateOrder";
 
 // Сайт
 import SiteLayout from "../pages/site/index";
@@ -53,6 +54,7 @@ const adminRoutes = [
 
   // Заказы
   { path: "/orders", element: <Orders /> },
+  { path: "/orders/create", element: <CreateOrder /> },
 
   // Сайт
   {
