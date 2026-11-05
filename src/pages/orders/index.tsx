@@ -1,8 +1,8 @@
 import UsagePanel, { type UsageSnapshot } from "@/components/UsagePanel";
-import { Calendar, Wifi, Phone, MessageSquare, History, Plus } from "lucide-react";
+import { Calendar, Wifi, Phone, MessageSquare, History, Plus, Ban } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ordersAPI } from "@/lib/api";
 import formatNumber from "@/utils/formatNumber";
@@ -24,6 +24,8 @@ import {
   SIM_ISSUE_OPTIONS,
 } from "@/constants/statusOptions";
 import { size } from "@/constants/paginationStuffs";
+import { showToast } from "@/utils/toastHelper";
+import { ORDER_STATUS_CLASSES, ORDER_STATUS_OPTIONS } from "@/constants/statusOptions";
 
 interface Tariff {
   id: number;
@@ -63,6 +65,7 @@ interface OrderUser {
 
 interface Order {
   id: number;
+  status: string;
   user: OrderUser | null;
   sims: Sim[];
   created_at: string;
@@ -79,6 +82,25 @@ function Orders() {
   const { user } = useAuthStore();
   // Бухгалтер заказы только смотрит; оформлять заказы клиентам могут администраторы
   const canCreate = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+  const queryClient = useQueryClient();
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+
+  const cancelMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
+      ordersAPI.cancelAdminOrder(id, reason),
+    onSuccess: (res) => {
+      showToast.success(res?.data?.message ?? "Заказ отменён");
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      setIsCancelOpen(false);
+      setCancelReason("");
+      setIsModalOpen(false);
+      setSelectedOrder(null);
+    },
+    onError: (error: any) => {
+      showToast.error(error?.response?.data?.message ?? "Не удалось отменить заказ");
+    },
+  });
 
   const { data: response, isLoading } = useQuery({
     queryKey: ["orders", params],
@@ -132,7 +154,24 @@ function Orders() {
           width="min-w-[800px]"
         >
           <div className="space-y-4 max-h-[70vh] overflow-y-auto">
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <StatusBadge
+                  options={ORDER_STATUS_OPTIONS}
+                  status={selectedOrder.status}
+                  classes={ORDER_STATUS_CLASSES}
+                />
+                {canCreate && selectedOrder.status !== "CANCELED" && (
+                  <button
+                    type="button"
+                    onClick={() => setIsCancelOpen(true)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-red-600 hover:underline"
+                  >
+                    <Ban className="w-3.5 h-3.5" />
+                    Отменить заказ
+                  </button>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => setIsHistoryOpen(true)}
@@ -386,6 +425,43 @@ function Orders() {
               </div>
             )}
           </div>
+        </UniversalModal>
+      )}
+
+      {isCancelOpen && selectedOrder && (
+        <UniversalModal
+          isShow={isCancelOpen}
+          title={`Отменить заказ #${selectedOrder.id}`}
+          btnText="Отменить заказ"
+          onClose={() => setIsCancelOpen(false)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (cancelReason.trim().length < 3) {
+              showToast.error("Укажите причину отмены");
+              return;
+            }
+            cancelMutation.mutate({ id: selectedOrder.id, reason: cancelReason.trim() });
+          }}
+          loading={cancelMutation.isPending}
+          width="min-w-[480px]"
+        >
+          <p className="text-sm text-gray-600">
+            Заказ и его eSIM получат статус «Отменён», оплата будет помечена как возврат.
+            Если клиент платил онлайн, деньги нужно вернуть вручную в кабинете Т-Банка.
+            Активированную eSIM отменить нельзя.
+          </p>
+          <label className="block text-sm font-medium text-gray-700">
+            Причина отмены
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              maxLength={1000}
+              rows={4}
+              autoFocus
+              className="mt-1 w-full rounded border border-gray-300 p-2 text-sm font-normal focus:outline-none focus:border-main-orange"
+              placeholder="Например: клиент передумал, деньги возвращены наличными"
+            />
+          </label>
         </UniversalModal>
       )}
 

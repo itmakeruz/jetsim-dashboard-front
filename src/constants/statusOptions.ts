@@ -4,12 +4,14 @@ export const ORDER_STATUS_OPTIONS = [
   { value: "COMPLETED", label: "Завершено" },
   { value: "FAILED", label: "Неуспешно" },
   { value: "ERROR", label: "Ошибка" },
+  { value: "CANCELED", label: "Отменён" },
 ];
 export const ORDER_STATUS_CLASSES: Record<string, string> = {
   CREATED: "bg-yellow-100 text-yellow-700", // В ожидании
   COMPLETED: "bg-blue-100 text-blue-700", // Завершено
   FAILED: "bg-red-100 text-red-700", // Неуспешно
   ERROR: "bg-gray-100 text-gray-700", // Ошибка
+  CANCELED: "bg-gray-200 text-gray-600", // Отменён сотрудником
 };
 // Transaction status options
 export const TRANSACTION_STATUS_OPTIONS = [
@@ -17,12 +19,16 @@ export const TRANSACTION_STATUS_OPTIONS = [
   { value: "SUCCESS", label: "Завершено" },
   { value: "FAILED", label: "Неуспешно" },
   { value: "ERROR", label: "Ошибка" },
+  { value: "CANCELED", label: "Отменено" },
+  { value: "REFUNDED", label: "Возврат" },
 ];
 export const TRANSACTION_STATUS_CLASSES: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700", // В ожидании
   SUCCESS: "bg-blue-100 text-blue-700", // Завершено
   FAILED: "bg-red-100 text-red-700", // Неуспешно
   ERROR: "bg-gray-100 text-gray-700", // Ошибка
+  CANCELED: "bg-gray-200 text-gray-600", // Отменено
+  REFUNDED: "bg-purple-100 text-purple-700", // Возврат
 };
 // Статус активации eSIM (Prisma SimStatus). null в БД = профиль ещё не активировали
 export const SIM_ACTIVATION_OPTIONS = [
@@ -44,6 +50,7 @@ export const SIM_ISSUE_OPTIONS = [
   { value: "PENDING", label: "В обработке" },
   { value: "COMPLETED", label: "Завершена" },
   { value: "FAILED", label: "Ошибка" },
+  { value: "CANCELED", label: "Отменена" },
 ];
 export const SIM_ISSUE_CLASSES: Record<string, string> = {
   CREATED: "bg-yellow-100 text-yellow-700",
@@ -52,6 +59,7 @@ export const SIM_ISSUE_CLASSES: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-700",
   COMPLETED: "bg-blue-100 text-blue-700",
   FAILED: "bg-red-100 text-red-700",
+  CANCELED: "bg-gray-200 text-gray-600",
 };
 
 // Transaction status options

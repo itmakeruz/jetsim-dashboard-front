@@ -82,6 +82,10 @@ export const ordersAPI = {
   searchTariffsForOrder: (search: string) =>
     axios.get("/tariff/admin", { params: { search: search || undefined, size: 20 } }),
 
+  // Отмена заказа сотрудником: причина обязательна, пишется в историю заказа
+  cancelAdminOrder: (id: number | string, reason: string) =>
+    axios.post(`/order/admin/${id}/cancel`, { reason }),
+
   // Пошаговая история выдачи: что отправили партнёру, что он ответил, где застряло
   getOrderHistory: (id: number | string) =>
     axios.get(`/order/admin/${id}/history`),
