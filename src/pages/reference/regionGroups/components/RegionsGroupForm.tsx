@@ -1,3 +1,4 @@
+import CoverImageField from "@/components/formElements/CoverImageField";
 import React, { useMemo, useState } from "react";
 import CustomInput from "@/components/formElements/CustomInput";
 import { handleChange } from "@/utils/handleChange";
@@ -33,7 +34,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
     }
     // Filter options to get only selected ones by ID
     return categoryOptions.filter((option: any) =>
-      formData.regions.map((region: any) => region.id).includes(option.id)
+      formData.regions.map((region: any) => region.id).includes(option.id),
     );
   }, [formData?.regions, categoryOptions]);
 
@@ -65,7 +66,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
       <CustomInput
         onChange={handleChange(setFormData, setPreviewImage)}
         className="max-w-[320px]"
-        label="Изображение"
+        label="Флаг / иконка"
         placeholder="Выберите иконку"
         name="image"
         type="file"
@@ -97,7 +98,7 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
         searchParam="search"
         searchDelay={500}
       />
-      {(previewImage || editData?.icon) && (
+      {(previewImage || editData?.image) && (
         <FormImgView
           previewImage={previewImage}
           formData={formData}
@@ -105,6 +106,17 @@ function RegionsGroupForm({ formData, setFormData, editData }) {
           alt="Region group flag"
         />
       )}
+      <CoverImageField
+        value={formData.cover_image}
+        removed={formData.remove_cover}
+        onChange={(file, remove) =>
+          setFormData((prev) => ({
+            ...prev,
+            cover_image: file,
+            remove_cover: remove,
+          }))
+        }
+      />
     </>
   );
 }

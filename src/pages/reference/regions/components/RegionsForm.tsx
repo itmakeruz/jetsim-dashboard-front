@@ -1,7 +1,8 @@
+import CoverImageField from "@/components/formElements/CoverImageField";
 import { useState } from "react";
 import CustomInput from "@/components/formElements/CustomInput";
 
-import { handleChange } from './../../../../utils/handleChange';
+import { handleChange } from "./../../../../utils/handleChange";
 import FormImgView from "@/components/FormImgView";
 import { statusOptions } from "@/constants/StaticOptions";
 import CustomSelect from "@/components/formElements/CustomSelect";
@@ -48,7 +49,7 @@ function RegionsForm({ formData, setFormData, editData }: RegionsFormProps) {
       <CustomInput
         onChange={handleChange(setFormData, setPreviewImage)}
         className="max-w-[320px] cursor-pointer"
-        label="Изображение"
+        label="Флаг / иконка"
         placeholder="Изображение"
         name="image"
         type="file"
@@ -63,6 +64,17 @@ function RegionsForm({ formData, setFormData, editData }: RegionsFormProps) {
           alt="Region image"
         />
       )}
+      <CoverImageField
+        value={formData.cover_image}
+        removed={formData.remove_cover}
+        onChange={(file, remove) =>
+          setFormData((prev) => ({
+            ...prev,
+            cover_image: file,
+            remove_cover: remove,
+          }))
+        }
+      />
     </>
   );
 }

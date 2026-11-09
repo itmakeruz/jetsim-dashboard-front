@@ -28,6 +28,8 @@ function Regions() {
     name_ru: "",
     name_en: "",
     image: null,
+    cover_image: null as File | string | null,
+    remove_cover: false,
     status: "ACTIVE",
   });
   const [selectedData, setSelectedData] = useState<any>(null);
@@ -95,6 +97,8 @@ function Regions() {
       name_ru: "",
       name_en: "",
       image: null,
+      cover_image: null as File | string | null,
+      remove_cover: false,
       status: "ACTIVE",
     });
     setModalType("");
@@ -113,6 +117,11 @@ function Regions() {
       if (formData.image && formData.image instanceof File) {
         formDataToSend.append("image", formData.image);
       }
+
+      if (formData.cover_image instanceof File) {
+        formDataToSend.append("cover_image", formData.cover_image);
+      }
+      if (formData.remove_cover) formDataToSend.append("remove_cover", "true");
 
       if (isEditMode) {
         await updateMutation.mutateAsync({
@@ -216,6 +225,8 @@ function Regions() {
                     name_ru: item.name_ru || "",
                     name_en: item.name_en || "",
                     image: item.image || null,
+                    cover_image: item.cover_image || null,
+                    remove_cover: false,
                     status: item.status || "ACTIVE",
                   });
                   setModalType("edit");

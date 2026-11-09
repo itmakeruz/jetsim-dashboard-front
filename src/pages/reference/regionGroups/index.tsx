@@ -26,6 +26,8 @@ function RegionsGroup() {
     name_ru: "",
     name_en: "",
     image: null as File | null,
+    cover_image: null as File | string | null,
+    remove_cover: false,
     region_ids: [],
   });
   const [selectedData, setSelectedData] = useState<any>(null);
@@ -55,13 +57,14 @@ function RegionsGroup() {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
       showToast.success(
-        response?.data?.message || "Группа регионов успешно создана!"
+        response?.data?.message || "Группа регионов успешно создана!",
       );
       closeModal();
     },
     onError: (error: any) => {
       showToast.error(
-        error?.response?.data?.message || "Произошла ошибка при создании группы"
+        error?.response?.data?.message ||
+          "Произошла ошибка при создании группы",
       );
     },
   });
@@ -73,14 +76,14 @@ function RegionsGroup() {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
       showToast.success(
-        response?.data?.message || "Группа регионов успешно обновлена!"
+        response?.data?.message || "Группа регионов успешно обновлена!",
       );
       closeModal();
     },
     onError: (error: any) => {
       showToast.error(
         error?.response?.data?.message ||
-          "Произошла ошибка при обновлении группы"
+          "Произошла ошибка при обновлении группы",
       );
     },
   });
@@ -90,13 +93,14 @@ function RegionsGroup() {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["regionGroups"] });
       showToast.success(
-        response?.data?.message || "Группа регионов успешно удалена!"
+        response?.data?.message || "Группа регионов успешно удалена!",
       );
       closeModal();
     },
     onError: (error: any) => {
       showToast.error(
-        error?.response?.data?.message || "Произошла ошибка при удалении группы"
+        error?.response?.data?.message ||
+          "Произошла ошибка при удалении группы",
       );
     },
   });
@@ -107,6 +111,8 @@ function RegionsGroup() {
       name_ru: "",
       name_en: "",
       image: null,
+      cover_image: null as File | string | null,
+      remove_cover: false,
       region_ids: [],
     });
     setModalType("");
@@ -128,6 +134,11 @@ function RegionsGroup() {
     }
 
     try {
+      if (formData.cover_image instanceof File) {
+        formDataToSend.append("cover_image", formData.cover_image);
+      }
+      if (formData.remove_cover) formDataToSend.append("remove_cover", "true");
+
       if (isEditMode) {
         await updateMutation.mutateAsync({
           id: selectedData.id,
@@ -231,6 +242,9 @@ function RegionsGroup() {
                   setSelectedData(item);
                   setFormData({
                     ...item,
+                    image: null,
+                    cover_image: item.cover_image || null,
+                    remove_cover: false,
                     region_ids: item.regions.map((region: any) => region.id),
                   });
                   setModalType("edit");
