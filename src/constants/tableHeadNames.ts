@@ -25,6 +25,7 @@ export const regionsTableHeadItems = [
   "Флаг",
   "Название (RU)",
   "Название (EN)",
+  "ISO",
   "Действие",
 ];
 

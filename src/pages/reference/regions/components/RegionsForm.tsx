@@ -37,6 +37,19 @@ function RegionsForm({ formData, setFormData, editData }: RegionsFormProps) {
         value={formData?.name_en ?? ""}
         required
       />
+      <CustomInput
+        onChange={(e) =>
+          setFormData((prev: any) => ({
+            ...prev,
+            iso_code: e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2),
+          }))
+        }
+        className="max-w-[320px]"
+        label="ISO-код страны"
+        placeholder="Например, TR (пусто, если это не страна)"
+        name="iso_code"
+        value={formData?.iso_code ?? ""}
+      />
       <CustomSelect
         onChange={handleChange(setFormData)}
         className="max-w-[320px] w-full"

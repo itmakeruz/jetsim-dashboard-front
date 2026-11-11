@@ -5,6 +5,7 @@ interface Item {
   id: number;
   name_ru: string;
   name_en: string;
+  iso_code?: string | null;
   image: string;
   status: string;
 }
@@ -37,6 +38,7 @@ function RegionsTbody({ datas, onEdit, onDelete, className }: RegionsTbodyProps)
           )}
           <span className="uppercase">{item.name_ru}</span>
           <span className="uppercase">{item.name_en}</span>
+          <span className="font-mono">{item.iso_code || "-"}</span>
           <div className="flex items-center justify-start gap-3">
             <Pencil
               onClick={() => onEdit(item)}

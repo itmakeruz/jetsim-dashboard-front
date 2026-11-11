@@ -27,6 +27,7 @@ function Regions() {
   const [formData, setFormData] = useState({
     name_ru: "",
     name_en: "",
+    iso_code: "",
     image: null,
     cover_image: null as File | string | null,
     remove_cover: false,
@@ -96,6 +97,7 @@ function Regions() {
     setFormData({
       name_ru: "",
       name_en: "",
+      iso_code: "",
       image: null,
       cover_image: null as File | string | null,
       remove_cover: false,
@@ -112,6 +114,8 @@ function Regions() {
       const formDataToSend = new FormData();
       formDataToSend.append("name_ru", formData.name_ru);
       formDataToSend.append("name_en", formData.name_en);
+      // Пустая строка сбрасывает код (регион не страна)
+      formDataToSend.append("iso_code", (formData.iso_code || "").trim().toUpperCase());
       formDataToSend.append("status", formData.status);
       // Only append image if it's a file
       if (formData.image && formData.image instanceof File) {
@@ -214,16 +218,17 @@ function Regions() {
           <div className="bg-white rounded shadow p-4">
             <UniversalTable
               tableHeadItems={regionsTableHeadItems}
-              className="grid-cols-[50px_1fr_1fr_1fr_auto]"
+              className="grid-cols-[50px_1fr_1fr_1fr_80px_auto]"
             >
               <RegionsTbody
-                className="grid-cols-[50px_1fr_1fr_1fr_auto]"
+                className="grid-cols-[50px_1fr_1fr_1fr_80px_auto]"
                 datas={datas}
                 onEdit={(item) => {
                   setSelectedData(item);
                   setFormData({
                     name_ru: item.name_ru || "",
                     name_en: item.name_en || "",
+                    iso_code: item.iso_code || "",
                     image: item.image || null,
                     cover_image: item.cover_image || null,
                     remove_cover: false,
